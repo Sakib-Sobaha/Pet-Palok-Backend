@@ -1,6 +1,6 @@
 package dev.sabri.securityjwt;
 
-import dev.sabri.securityjwt.user.User;
+import dev.sabri.securityjwt.scopes.user.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
