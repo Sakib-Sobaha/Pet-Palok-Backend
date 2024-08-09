@@ -1,32 +1,37 @@
 package dev.sabri.securityjwt.scopes.user;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Indexed;
+import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.lang.annotation.Documented;
 import java.util.Collection;
+@Data
+@Document(collection = "_user")
 
-@Table(name = "_user")
-@Entity
 public class User implements UserDetails {
     @Id
-    @SequenceGenerator(
-            name = "user_id_sequence",
-            sequenceName = "user_id_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "user_id_sequence"
-    )
+//    @SequenceGenerator(
+//            name = "user_id_sequence",
+//            sequenceName = "user_id_sequence",
+//            allocationSize = 1
+//    )
+//    @GeneratedValue(
+//            strategy = GenerationType.SEQUENCE,
+//            generator = "user_id_sequence"
+//    )
 
     @Setter
     @Getter
-    private Integer id;
+    private String id;
     @Setter
     @Getter
     private String firstname;
@@ -35,7 +40,7 @@ public class User implements UserDetails {
     private String lastname;
     @Setter
     @Getter
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String email;
     @Setter
     @Getter
@@ -65,15 +70,15 @@ public class User implements UserDetails {
     private Integer ratingPetKeeping;
     private Integer ratingVet;
     private String about;
-    @Enumerated(EnumType.STRING)
+
     Gender gender;
-    @Enumerated(EnumType.STRING)
-    Role role;
+
+    Role role = Role.USER;
 
     public User() {
     }
 
-    public User(Integer id, String firstname, String lastname, String email, String passwd, Role role) {
+    public User(String id, String firstname, String lastname, String email, String passwd, Role role) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -84,7 +89,7 @@ public class User implements UserDetails {
 
 
 
-
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(role.name());

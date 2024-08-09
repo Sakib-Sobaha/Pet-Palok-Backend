@@ -13,6 +13,7 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,27 +39,23 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf()
-                .disable()
-                .authorizeHttpRequests()
-                .requestMatchers(AntPathRequestMatcher
-                                .antMatcher("/"),
-                        AntPathRequestMatcher
-                                .antMatcher("/error"),
-                        AntPathRequestMatcher
-                                .antMatcher("/favicon.ico"),
-                        AntPathRequestMatcher
-                                .antMatcher("/actuator/*"),
-                        AntPathRequestMatcher
-                                .antMatcher("/api/v1/auth/*")
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.
+                        requestMatchers(
+                                new AntPathRequestMatcher("/"),
+                                new AntPathRequestMatcher("/error"),
+                                new AntPathRequestMatcher("/favicon.ico"),
+                                new AntPathRequestMatcher("/actuator/*"),
+                                new AntPathRequestMatcher("/api/*"),
+                                new AntPathRequestMatcher("/api/v1/*"),
+                                new AntPathRequestMatcher("/api/v1/auth/*")
+                        )
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(new JwtAuthenticationFilter(userDetailsService()), UsernamePasswordAuthenticationFilter.class)
                 .build();

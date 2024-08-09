@@ -32,12 +32,12 @@ public class UserController {
     }
 
     @DeleteMapping("{userId}")
-    public void deleteUser(@PathVariable("userId") Integer userId) {
+    public void deleteUser(@PathVariable("userId") String userId) {
         userRepository.deleteById(userId);
     }
 
     @PutMapping("{userId}")
-    public void updateUser(@PathVariable("userId") Integer userId, @RequestBody NewUserRequest newUserRequest) {
+    public void updateUser(@PathVariable("userId") String userId, @RequestBody NewUserRequest newUserRequest) {
         User user = userService.findUserById(userId);
         if(user == null) {
             System.out.printf("User with id %s not found", userId);

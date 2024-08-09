@@ -2,29 +2,23 @@ package dev.sabri.securityjwt.scopes.vets;
 
 import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
-import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Indexed;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.Collection;
 
-@Table(name = "_vet")
-@Entity
+@Document(collection = "_vet")
+
 public class Vets implements UserDetails {
     @Id
-    @SequenceGenerator(
-            name = "vet_id_sequence",
-            sequenceName = "vet_id_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "vet_id_sequence"
-    )
+
 
     @Setter
     @Getter
@@ -37,7 +31,7 @@ public class Vets implements UserDetails {
     private String lastname;
     @Setter
     @Getter
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String email;
     @Setter
     @Getter
@@ -67,9 +61,9 @@ public class Vets implements UserDetails {
     @Setter
     @Getter
     private String clinic;
-    @Enumerated(EnumType.STRING)
+
     Gender gender;
-    @Enumerated(EnumType.STRING)
+
     Role role;
 
     public Vets() {

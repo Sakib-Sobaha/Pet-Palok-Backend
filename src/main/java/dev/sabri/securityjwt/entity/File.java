@@ -1,24 +1,24 @@
 package dev.sabri.securityjwt.entity;
 
 
-import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
-@Entity
+
+@Setter
+@Getter
 public class File {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Getter
-    @Setter
+
     private String name;
-    @Getter
-    @Setter
+
     private String type;
-    @Getter
-    @Setter
-    @Lob
+
+//    @Lob
     private byte[] data;
 
     // Getters and setters

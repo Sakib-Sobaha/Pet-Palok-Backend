@@ -22,7 +22,7 @@ public class UserService {
 //        return userRepository.findByEmail(email);
 //    }
 
-    public User findUserById(Integer id){
+    public User findUserById(String id){
         return userRepository.findUserById(id);
     }
 }
