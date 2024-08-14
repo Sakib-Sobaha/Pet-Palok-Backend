@@ -3,7 +3,7 @@ package dev.sabri.securityjwt.service;
 import dev.sabri.securityjwt.controller.dto.AuthenticationRequest;
 import dev.sabri.securityjwt.controller.dto.AuthenticationResponse;
 import dev.sabri.securityjwt.controller.dto.RegisterRequest;
-import dev.sabri.securityjwt.repo.UserRepository;
+import dev.sabri.securityjwt.repository.UserRepository;
 import dev.sabri.securityjwt.scopes.user.*;
 import dev.sabri.securityjwt.utils.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;

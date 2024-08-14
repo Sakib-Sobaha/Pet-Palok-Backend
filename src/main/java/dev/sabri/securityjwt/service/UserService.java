@@ -1,7 +1,7 @@
 package dev.sabri.securityjwt.service;
 
 
-import dev.sabri.securityjwt.repo.UserRepository;
+import dev.sabri.securityjwt.repository.UserRepository;
 import dev.sabri.securityjwt.scopes.user.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -26,22 +26,22 @@ public class SecurityJwtApplication {
 		return new RestTemplate();
 	}
 
-	@Bean
-	public CommandLineRunner run(ApiService apiService) {
-		return args -> {
-			String email = "sobaha@gmail.com";
-			String password = "123456";
-			RegisterRequest request = new RegisterRequest("Suvro", "Gazi", email, password);
-
-			String token = apiService.registerUser(request);
-
-			System.out.println(token);
-
-			List<User> users = apiService.getAllUsers(token);
-			users.forEach(user_ ->
-				System.out.printf(String.valueOf(user_)));
-		};
-	}
+//	@Bean
+//	public CommandLineRunner run(ApiService apiService) {
+//		return args -> {
+//			String email = "amlama@gmail.com";
+//			String password = "123456";
+//			RegisterRequest request = new RegisterRequest("Suvro", "Gazi", email, password);
+//
+//			String token = apiService.registerUser(request);
+//
+//			System.out.println(token);
+//
+//			List<User> users = apiService.getAllUsers(token);
+//			users.forEach(user_ ->
+//				System.out.printf(String.valueOf(user_)));
+//		};
+//	}
 
 
 

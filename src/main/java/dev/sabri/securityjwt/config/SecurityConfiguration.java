@@ -1,6 +1,6 @@
 package dev.sabri.securityjwt.config;
 
-import dev.sabri.securityjwt.repo.UserRepository;
+import dev.sabri.securityjwt.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -22,6 +22,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+import java.util.List;
+
 
 @Configuration
 @EnableWebSecurity
@@ -39,6 +44,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.
                         requestMatchers(
@@ -48,7 +54,8 @@ public class SecurityConfiguration {
                                 new AntPathRequestMatcher("/actuator/*"),
                                 new AntPathRequestMatcher("/api/*"),
                                 new AntPathRequestMatcher("/api/v1/*"),
-                                new AntPathRequestMatcher("/api/v1/auth/*")
+                                new AntPathRequestMatcher("/api/v1/auth/*"),
+                                new AntPathRequestMatcher("http://localhost:3000/*")
                         )
                         .permitAll()
                         .anyRequest()
@@ -78,6 +85,19 @@ public class SecurityConfiguration {
 
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Specify allowed origins
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Specify allowed methods
+        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type")); // Specify allowed headers
+        configuration.setAllowCredentials(true); // Allow credentials if needed
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Apply CORS policy to all endpoints
+
+        return source;
+    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

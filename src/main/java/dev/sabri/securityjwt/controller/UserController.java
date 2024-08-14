@@ -2,9 +2,10 @@ package dev.sabri.securityjwt.controller;
 
 
 import dev.sabri.securityjwt.service.UserService;
-import dev.sabri.securityjwt.repo.UserRepository;
+import dev.sabri.securityjwt.repository.UserRepository;
 import dev.sabri.securityjwt.scopes.user.*;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,12 +38,16 @@ public class UserController {
     }
 
     @PutMapping("{userId}")
-    public void updateUser(@PathVariable("userId") String userId, @RequestBody NewUserRequest newUserRequest) {
+    public ResponseEntity<String> updateUser(@PathVariable("userId") String userId, @RequestBody NewUserRequest newUserRequest) {
         User user = userService.findUserById(userId);
         if(user == null) {
             System.out.printf("User with id %s not found", userId);
         }
-        setUserDetails(newUserRequest, user);
+//        setUserDetails(newUserRequest, user);
+        assert user != null;
+        userRepository.save(new User(user.getId(), newUserRequest.firstName, newUserRequest.lastName, newUserRequest.password));
+        return ResponseEntity.ok("User updated successfully");
+
     }
 
 

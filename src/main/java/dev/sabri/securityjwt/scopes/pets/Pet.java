@@ -35,7 +35,9 @@ public class Pet {
 //    )
 
 
-    private Integer id;
+    private String id;
+
+    private String ownerId;
 
 
     private String name;
@@ -63,6 +65,19 @@ public class Pet {
     Gender gender;
 
     private boolean vetVerified;
+
+    private String image;
+
+    public Pet(String name, int age, String type, String breed, String description, Gender gender, boolean vetVerified) {
+        this.name = name;
+        this.age = age;
+        this.type = type;
+        this.breed = breed;
+        this.description = description;
+        this.gender = gender;
+        this.vetVerified = vetVerified;
+
+    }
 
     @Override
     public String toString() {

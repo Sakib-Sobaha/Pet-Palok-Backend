@@ -1,4 +1,4 @@
-package dev.sabri.securityjwt.repo;
+package dev.sabri.securityjwt.repository;
 
 import dev.sabri.securityjwt.scopes.user.*;
 

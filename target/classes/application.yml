@@ -3,3 +3,12 @@ spring:
     mongodb:
       uri: mongodb+srv://admin:jVqKz2nMEMlD59yu@petcluster0.t2gzm.mongodb.net/?retryWrites=true&w=majority&appName=PetCluster0
       database: petpalokdb
+  cloud:
+    azure:
+      storage:
+        account-name: petpalokonline
+        account-key: 2rjrJLO2xyUOt0w+L2tiOzVtQaPNGcvTtq55+Av15RpEPAUb9ePqQpaZpchaDMe80yKlA1AN8dRt+AStxqLVYA==
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 20MB

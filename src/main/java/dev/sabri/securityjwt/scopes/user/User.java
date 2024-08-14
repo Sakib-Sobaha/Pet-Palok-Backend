@@ -87,6 +87,12 @@ public class User implements UserDetails {
         this.role = role;
     }
 
+    public User(String id,String firstname, String lastname, String passwd) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.passwd = passwd;
+    }
+
 
 
     @JsonIgnore
