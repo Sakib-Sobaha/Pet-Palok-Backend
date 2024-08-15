@@ -88,16 +88,25 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Specify allowed origins
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Specify allowed methods
-        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type")); // Specify allowed headers
-        configuration.setAllowCredentials(true); // Allow credentials if needed
+        // Allow all origins
+        configuration.setAllowedOrigins(List.of("*"));
 
+        // Allow all HTTP methods
+        configuration.setAllowedMethods(List.of("*"));
+
+        // Allow all headers
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // Allow credentials if needed (be cautious with this in production)
+        configuration.setAllowCredentials(true);
+
+        // Create and register the CORS configuration for all endpoints
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply CORS policy to all endpoints
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

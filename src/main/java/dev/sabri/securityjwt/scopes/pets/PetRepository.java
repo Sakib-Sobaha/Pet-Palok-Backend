@@ -13,4 +13,5 @@ public interface PetRepository extends MongoRepository<Pet, String> {
     Pet findPetById(String id);
 
     Optional<List<Pet>> findPetByOwnerId(String ownerId);
+
 }

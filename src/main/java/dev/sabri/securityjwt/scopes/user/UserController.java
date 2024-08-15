@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.security.Principal;
+
 import java.util.List;
 
 @RestController
@@ -19,6 +22,19 @@ public class UserController {
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+
+    @GetMapping("/whoami")
+    public ResponseEntity<User> getLoggedInUser(Principal principal) {
+        String email = principal.getName();  // Get the logged-in user's email
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     record NewUserRequest(String firstName, String lastName, String email, String password) {
