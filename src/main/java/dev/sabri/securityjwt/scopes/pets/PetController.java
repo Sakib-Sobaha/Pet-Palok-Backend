@@ -31,6 +31,15 @@ public class PetController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
+    @GetMapping("/petByOwnerId/{ownerId}")
+    public ResponseEntity<List<Pet>> getPetByOwnerId(@PathVariable("ownerId") String ownerId) {
+        return petRepository.findPetByOwnerId(ownerId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+
+
     record NewPetRequest(String name, int age, String type, String breed, String description, Gender gender, boolean vetVerified) {
 
     }

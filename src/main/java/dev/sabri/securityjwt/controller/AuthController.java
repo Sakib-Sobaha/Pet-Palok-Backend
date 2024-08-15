@@ -26,6 +26,8 @@ public record AuthController(AuthenticationService authenticationService) {
 
     @PostMapping("/auth/authenticate")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody AuthenticationRequest request) {
+        System.out.println("hello request received");
+        System.out.println(request.email() + " " + request.password());
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
@@ -46,6 +48,8 @@ public record AuthController(AuthenticationService authenticationService) {
 
     @PostMapping("/user/authenticate")
     public ResponseEntity<AuthenticationResponse> userAuthenticate(@RequestBody AuthenticationRequest request) {
+        System.out.println("authenticate request received");
+        System.out.println(request.email() + " " + request.password());
         return ResponseEntity.ok(authenticationService.userAuthenticate(request));
     }
 

@@ -29,7 +29,7 @@ public class SecurityJwtApplication {
 //	@Bean
 //	public CommandLineRunner run(ApiService apiService) {
 //		return args -> {
-//			String email = "amlama@gmail.com";
+//			String email = "sobaha@gmail.com";
 //			String password = "123456";
 //			RegisterRequest request = new RegisterRequest("Suvro", "Gazi", email, password);
 //
