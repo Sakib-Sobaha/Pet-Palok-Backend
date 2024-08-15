@@ -1,67 +1,40 @@
-package dev.sabri.securityjwt.scopes.seller;
-
+package dev.sabri.securityjwt.scopes.admin;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.sabri.securityjwt.scopes.user.Role;
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
+
 @Setter
-@Document(collection = "_seller")
-
-public class Seller implements UserDetails {
-
+@Getter
+@Data
+@Document(collection = "_admin")
+public class Admin implements UserDetails {
     @Id
-//    @SequenceGenerator(
-//            name = "seller_id_sequence",
-//            sequenceName = "seller_id_sequence",
-//            allocationSize = 1
-//    )
-//    @GeneratedValue(
-//            strategy = GenerationType.SEQUENCE,
-//            generator = "seller_id_sequence"
-//    )
-
-
     private String id;
     private String name;
-    @Indexed(unique = true)
     private String email;
-    private String storeName;
-    private String slogan;
-    private String passwd;
-    private String phone;
-    private String address;
-    private String info;
-    private LocalDateTime dob;
-    Role role;
-//    List<String> items = new ArrayList<String>();
+    private String password;
+    Role role = Role.ADMIN;
 
-    public Seller(String id, String email, String passwd, Role role) {
+    public Admin() {}
+
+    public Admin(String id,String email, String password, Role role) {
         this.id = id;
         this.email = email;
-        this.passwd = passwd;
+        this.password = password;
         this.role = role;
-
     }
-
 
     @JsonIgnore
     @Override
@@ -72,7 +45,7 @@ public class Seller implements UserDetails {
 
     @Override
     public String getPassword() {
-        return passwd;
+        return password;
     }
 
     @Override
@@ -100,7 +73,11 @@ public class Seller implements UserDetails {
         return true;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "Admin{" +
+                "name='" + name + '\'' +
+                ", email='" + email +
+                '}';
+    }
 }

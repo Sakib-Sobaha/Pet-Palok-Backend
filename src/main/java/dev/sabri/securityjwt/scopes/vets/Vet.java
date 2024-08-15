@@ -1,6 +1,7 @@
-package dev.sabri.securityjwt.scopes.user;
+package dev.sabri.securityjwt.scopes.vets;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.sabri.securityjwt.scopes.user.Gender;
+import dev.sabri.securityjwt.scopes.user.Role;
 
 import lombok.Data;
 import lombok.Getter;
@@ -12,24 +13,16 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.mongodb.core.index.Indexed;
 
-import java.lang.annotation.Documented;
 import java.util.Collection;
+
 @Setter
 @Getter
 @Data
-@Document(collection = "_user")
+@Document(collection = "_vet")
 
-public class User implements UserDetails {
+public class Vet implements UserDetails {
     @Id
-//    @SequenceGenerator(
-//            name = "user_id_sequence",
-//            sequenceName = "user_id_sequence",
-//            allocationSize = 1
-//    )
-//    @GeneratedValue(
-//            strategy = GenerationType.SEQUENCE,
-//            generator = "user_id_sequence"
-//    )
+
 
 
     private String id;
@@ -42,7 +35,6 @@ public class User implements UserDetails {
     private String email;
 
     private String phoneNumber;
-
     private String passwd;
 
     private String address;
@@ -57,18 +49,18 @@ public class User implements UserDetails {
 
     private Integer ratingBuySellExchange;
 
-    private Integer ratingPetKeeping;
-    private Integer ratingVet;
     private String about;
+
+    private String clinic;
 
     Gender gender;
 
-    Role role = Role.USER;
+    Role role;
 
-    public User() {
+    public Vet() {
     }
 
-    public User(String id, String firstname, String lastname, String email, String passwd, Role role) {
+    public Vet(String id, String firstname, String lastname, String email, String passwd, Role role) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -77,23 +69,16 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public User(String id,String firstname, String lastname, String passwd) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.passwd = passwd;
-    }
-
-    public User(String id, String email, String passwd, Role role) {
+    public Vet(String id, String email, String passwd, Role role) {
         this.id = id;
         this.email = email;
         this.passwd = passwd;
         this.role = role;
-
     }
 
 
 
-    @JsonIgnore
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(role.name());
@@ -146,8 +131,8 @@ public class User implements UserDetails {
                 ", gender='" + gender + '\'' +
                 ", about='" + about + '\'' +
                 ", ratingBuySellExch=" + ratingBuySellExchange +
-                ", ratingPetKeeping=" + ratingPetKeeping +
-                ", ratingVet=" + ratingVet +
+                ", clinic=" + clinic +
+                ", ratingVet=" +
                 '}';
     }
 

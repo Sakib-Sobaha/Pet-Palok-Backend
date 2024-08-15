@@ -1,6 +1,6 @@
 package dev.sabri.securityjwt.config;
 
-import dev.sabri.securityjwt.repository.UserRepository;
+import dev.sabri.securityjwt.scopes.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;

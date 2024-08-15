@@ -66,7 +66,7 @@ public class Pet {
 
     private boolean vetVerified;
 
-    private String image;
+    private String[] images;
 
     public Pet(String name, int age, String type, String breed, String description, Gender gender, boolean vetVerified) {
         this.name = name;
