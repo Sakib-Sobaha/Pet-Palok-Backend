@@ -29,11 +29,8 @@ public class SecurityJwtApplication {
 //	@Bean
 //	public CommandLineRunner run(ApiService apiService) {
 //		return args -> {
-<<<<<<< HEAD
 //			String email = "sobaha@gmail.com";
-=======
-//			String email = "amlama@gmail.com";
->>>>>>> dceda92 (appointmentRequest)
+
 //			String password = "123456";
 //			RegisterRequest request = new RegisterRequest("Suvro", "Gazi", email, password);
 //

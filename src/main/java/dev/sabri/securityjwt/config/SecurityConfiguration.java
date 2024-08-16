@@ -1,6 +1,9 @@
 package dev.sabri.securityjwt.config;
 
+import dev.sabri.securityjwt.scopes.admin.AdminRepository;
+import dev.sabri.securityjwt.scopes.seller.SellerRepository;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
+import dev.sabri.securityjwt.scopes.vets.VetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -36,8 +39,19 @@ public class SecurityConfiguration {
 
     private final UserRepository userRepository;
 
-    public SecurityConfiguration(UserRepository userRepository) {
+    private final AdminRepository adminRepository;
+
+    private final SellerRepository sellerRepository;
+
+    private final VetRepository vetRepository;
+
+
+
+    public SecurityConfiguration(UserRepository userRepository, AdminRepository adminRepository, SellerRepository sellerRepository, VetRepository vetRepository) {
         this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
+        this.sellerRepository = sellerRepository;
+        this.vetRepository = vetRepository;
     }
 
 
@@ -52,10 +66,11 @@ public class SecurityConfiguration {
                                 new AntPathRequestMatcher("/error"),
                                 new AntPathRequestMatcher("/favicon.ico"),
                                 new AntPathRequestMatcher("/actuator/*"),
-                                new AntPathRequestMatcher("/api/*"),
-                                new AntPathRequestMatcher("/api/v1/*"),
+                                new AntPathRequestMatcher("/api/**"),
+                                new AntPathRequestMatcher("/api/v1/**"),
                                 new AntPathRequestMatcher("/api/v1/auth/*"),
-                                new AntPathRequestMatcher("http://localhost:3000/*")
+                                new AntPathRequestMatcher("/api/v1/auth/**"),
+                                new AntPathRequestMatcher("http://localhost:3000/**")
                         )
                         .permitAll()
                         .anyRequest()
@@ -69,12 +84,42 @@ public class SecurityConfiguration {
 
     }
 
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return username -> userRepository
+//                .findByEmail(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User Not Found !"));
+//    }
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository
-                .findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found !"));
+        return username -> {
+
+            var user = userRepository.findByEmail(username);
+            if(user.isPresent()) {
+                return user.get();
+            }
+
+            var admin = adminRepository.findByEmail(username);
+            if(admin.isPresent()) {
+                return admin.get();
+            }
+
+            var seller = sellerRepository.findByEmail(username);
+            if(seller.isPresent()) {
+                return seller.get();
+            }
+
+            var vet = vetRepository.findByEmail(username);
+            if(vet.isPresent()) {
+                return vet.get();
+            }
+
+            throw new UsernameNotFoundException("User not found with email: " + username);
+        };
     }
+
+
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -84,6 +129,8 @@ public class SecurityConfiguration {
         return authenticationProvider;
 
     }
+
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -98,7 +145,7 @@ public class SecurityConfiguration {
         configuration.setAllowedHeaders(List.of("*"));
 
         // Allow credentials if needed (be cautious with this in production)
-        configuration.setAllowCredentials(true);
+//        configuration.setAllowCredentials(true);
 
         // Create and register the CORS configuration for all endpoints
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

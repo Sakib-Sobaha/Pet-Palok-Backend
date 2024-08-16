@@ -47,16 +47,6 @@ public class Pet {
     private String type;
 
     private String breed;
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "video_id")
-//    @Setter
-//    @Getter
-//    private File photos;
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "video_id")
-//    @Setter
-//    @Getter
-//    private File videos;
 
     private String description;
 
@@ -66,7 +56,8 @@ public class Pet {
 
     private boolean vetVerified;
 
-    private String[] images;
+
+    private List<String> imageUrls;
 
     public Pet(String name, int age, String type, String breed, String description, Gender gender, boolean vetVerified) {
         this.name = name;
