@@ -54,6 +54,8 @@ public class PetController {
     @PostMapping("/create-pet")
     public ResponseEntity<String> createPet(@RequestBody NewPetRequest newPetRequest) {
         Pet pet = new Pet(newPetRequest.ownerId, newPetRequest.name, newPetRequest.type,newPetRequest.breed, newPetRequest.description, newPetRequest.gender, newPetRequest.vetVerified, newPetRequest.images);
+        System.out.println("Received new pet request: " );
+        System.out.println(newPetRequest.name + " " + newPetRequest.description+ "imageUrl" + newPetRequest.images);
 //        List<String> imageUrls = new ArrayList<>();
 //
 //        //Upload each image and store the url
