@@ -16,9 +16,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -46,7 +44,7 @@ public class Seller implements UserDetails {
     private String email;
     private String storeName;
     private String slogan;
-    private String passwd;
+    private String password;
     private String phone;
     private String address;
     private String info;
@@ -57,7 +55,7 @@ public class Seller implements UserDetails {
     public Seller(String id, String email, String passwd, Role role) {
         this.id = id;
         this.email = email;
-        this.passwd = passwd;
+        this.password = passwd;
         this.role = role;
 
     }
@@ -72,7 +70,7 @@ public class Seller implements UserDetails {
 
     @Override
     public String getPassword() {
-        return passwd;
+        return password;
     }
 
     @Override

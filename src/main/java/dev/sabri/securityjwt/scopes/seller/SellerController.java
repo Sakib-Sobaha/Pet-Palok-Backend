@@ -1,7 +1,7 @@
 package dev.sabri.securityjwt.scopes.seller;
 
 
-import dev.sabri.securityjwt.scopes.user.User;
+import dev.sabri.securityjwt.scopes.user.Role;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class SellerController {
     }
 
     @GetMapping("/whoami")
-    public ResponseEntity<Seller> getLoggedInUser(Principal principal) {
+    public ResponseEntity<Seller> getLoggedInSeller(Principal principal) {
         String email = principal.getName();
         Seller seller = sellerRepository.findByEmail(email).orElse(null);
 
@@ -40,13 +41,13 @@ public class SellerController {
 
     }
 
-    record UpdateSellerRequest(String name, String password, String storeName) {}
+    record UpdateSellerRequest(String name, String storeName, String slogan, String password, String phone, String address, String info, LocalDateTime dob, Role role) {}
 
     @PostMapping
     public ResponseEntity<String> addSeller(@RequestBody NewSellerRequest newSellerRequest) {
         Seller seller = new Seller();
         seller.setEmail(newSellerRequest.email());
-        seller.setPasswd(passwordEncoder.encode(newSellerRequest.password()));
+        seller.setPassword(passwordEncoder.encode(newSellerRequest.password()));
         sellerRepository.save(seller);
         return ResponseEntity.ok("Seller account registered successfully");
     }
@@ -74,9 +75,22 @@ public class SellerController {
         if (request.storeName() != null) {
             seller.setStoreName(request.storeName());
         }
-        if (request.password() != null) {
-            seller.setPasswd(passwordEncoder.encode(request.password()));
+        if (request.slogan() != null) {
+            seller.setSlogan(request.slogan());
         }
+        if (request.password() != null) {
+            seller.setPassword(passwordEncoder.encode(request.password()));
+        }
+        if(request.phone() != null) {
+            seller.setPhone(request.phone());
+        }
+        if(request.address() != null) {
+            seller.setAddress(request.address());
+        }
+        if(request.info() != null) {
+            seller.setInfo(request.info());
+        }
+
 
         // Log user details after updating
         System.out.println("After update: " + seller);

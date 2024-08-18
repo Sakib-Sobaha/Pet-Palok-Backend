@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class NewPetRequest {
+    public String ownerId;
     public String name;
     public LocalDateTime dob;
     public String type;
@@ -21,7 +22,7 @@ public class NewPetRequest {
 
     }
 
-    public NewPetRequest(String name, LocalDateTime dob, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
+    public NewPetRequest(String ownerId, String name, LocalDateTime dob, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
         this.name = name;
         this.dob = dob;
         this.type = type;
