@@ -2,6 +2,8 @@ package dev.sabri.securityjwt.scopes.user;
 
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
+    @Autowired
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -49,32 +52,44 @@ public class UserController {
         setUserDetails(newUserRequest, user);
     }
 
-    @DeleteMapping("{userId}")
+    @DeleteMapping("/delete/{userId}")
     public void deleteUser(@PathVariable("userId") String userId) {
         userRepository.deleteById(userId);
     }
 
-    @PutMapping("{userId}")
+    @PutMapping("/update/{userId}")
     public ResponseEntity<String> updateUser(@PathVariable("userId") String userId, @RequestBody UpdateUserRequest request) {
         User user = userService.findUserById(userId);
-        if(user == null) {
+        if (user == null) {
             System.out.printf("User with id %s not found", userId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-//        setUserDetails(newUserRequest, user);
-        assert user != null;
-        final var user_ = new User(null,
-                request.firstName(),
-                request.lastName(),
-                user.getEmail(),
-                passwordEncoder.encode(request.password()),
-                Role.USER);
-        user_.setFirstname(request.firstName());
-        user_.setLastname(request.lastName());
-        userRepository.save(user_);
-        System.out.println(user_);
-        userRepository.deleteById(userId);
-        return ResponseEntity.ok("User updated successfully");
 
+        // Log current user details before updating
+        System.out.println("Before update: " + user);
+
+        // Update only the fields that are present in the request
+        if (request.firstName() != null) {
+            user.setFirstname(request.firstName());
+        }
+        if (request.lastName() != null) {
+            user.setLastname(request.lastName());
+        }
+        if (request.password() != null) {
+            user.setPasswd(passwordEncoder.encode(request.password()));
+        }
+
+        // Log user details after updating
+        System.out.println("After update: " + user);
+
+        // Save the updated user
+        userRepository.save(user);
+
+        // Fetch the user again to verify if the update was applied
+        User updatedUser = userService.findUserById(userId);
+        System.out.println("Updated user from DB: " + updatedUser);
+
+        return ResponseEntity.ok("User updated successfully");
     }
 
 

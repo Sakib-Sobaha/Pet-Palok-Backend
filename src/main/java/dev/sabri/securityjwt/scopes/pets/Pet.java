@@ -42,7 +42,7 @@ public class Pet {
 
     private String name;
 
-    private int age;
+//    private int age;
 
     private String type;
 
@@ -57,11 +57,10 @@ public class Pet {
     private boolean vetVerified;
 
 
-    private List<String> imageUrls;
+    private List<String> images;
 
-    public Pet(String name, int age, String type, String breed, String description, Gender gender, boolean vetVerified) {
+    public Pet(String name, String type, String breed, String description, Gender gender, boolean vetVerified) {
         this.name = name;
-        this.age = age;
         this.type = type;
         this.breed = breed;
         this.description = description;
@@ -70,11 +69,24 @@ public class Pet {
 
     }
 
+
+
+    public Pet(String name, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
+        this.name = name;
+        this.type = type;
+        this.breed = breed;
+        this.description = description;
+        this.gender = gender;
+        this.vetVerified = vetVerified;
+        this.images = images;
+
+    }
+
+
     @Override
     public String toString() {
         return "Pet{" +
                 "name='" + name + '\'' +
-                ", age=" + age +
                 ", type='" + type + '\'' +
                 ", breed='" + breed + '\'' +
                 ", dob=" + dob +

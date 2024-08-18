@@ -3,7 +3,6 @@ package dev.sabri.securityjwt.scopes.pets;
 
 import dev.sabri.securityjwt.client.imagestorage.AzureImageStorageClient;
 import dev.sabri.securityjwt.scopes.pets.dto.NewPetRequest;
-import dev.sabri.securityjwt.scopes.user.Gender;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,22 +53,22 @@ public class PetController {
 
     @PostMapping("/create-pet")
     public ResponseEntity<String> createPet(@RequestBody NewPetRequest newPetRequest) {
-        Pet pet = new Pet(newPetRequest.name, newPetRequest.age, newPetRequest.type,newPetRequest.breed, newPetRequest.description, newPetRequest.gender, newPetRequest.vetVerified);
-        List<String> imageUrls = new ArrayList<>();
-
-        //Upload each image and store the url
-        for(MultipartFile image: newPetRequest.images){
-            try{
-                String imageUrl = azureImageStorageClient.uploadImage("petpalok-image-container",
-                        Objects.requireNonNull(image.getOriginalFilename()), image.getInputStream(), image.getSize());
-                imageUrls.add(imageUrl);
-
-            }catch (IOException e){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image" + image.getOriginalFilename());
-            }
-        }
-
-        pet.setImageUrls(imageUrls);
+        Pet pet = new Pet(newPetRequest.name, newPetRequest.type,newPetRequest.breed, newPetRequest.description, newPetRequest.gender, newPetRequest.vetVerified, newPetRequest.images);
+//        List<String> imageUrls = new ArrayList<>();
+//
+//        //Upload each image and store the url
+//        for(MultipartFile image: newPetRequest.images){
+//            try{
+//                String imageUrl = azureImageStorageClient.uploadImage("petpalok-image-container",
+//                        Objects.requireNonNull(image.getOriginalFilename()), image.getInputStream(), image.getSize());
+//                imageUrls.add(imageUrl);
+//
+//            }catch (IOException e){
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image" + image.getOriginalFilename());
+//            }
+//        }
+//
+//        pet.setImages(imageUrls);
 
         petRepository.save(pet);
         //handle multiple images
