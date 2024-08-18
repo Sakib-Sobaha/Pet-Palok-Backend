@@ -72,6 +72,7 @@ public class Pet {
 
 
     public Pet(String ownerId, String name, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
+        this.ownerId = ownerId;
         this.name = name;
         this.type = type;
         this.breed = breed;
