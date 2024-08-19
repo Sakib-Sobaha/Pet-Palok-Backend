@@ -62,6 +62,8 @@ public class User implements UserDetails {
     private Integer ratingVet;
     private String about;
 
+    private String image;
+
     Gender gender;
 
     Role role = Role.USER;

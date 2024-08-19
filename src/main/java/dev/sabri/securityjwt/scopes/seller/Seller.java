@@ -49,6 +49,7 @@ public class Seller implements UserDetails {
     private String address;
     private String info;
     private LocalDateTime dob;
+    private String image;
     Role role;
 //    List<String> items = new ArrayList<String>();
 

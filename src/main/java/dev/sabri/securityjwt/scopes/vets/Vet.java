@@ -54,6 +54,8 @@ public class Vet implements UserDetails {
 
     private String clinic;
 
+    private String image;
+
     Gender gender;
 
     Role role;
