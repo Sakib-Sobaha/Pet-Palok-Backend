@@ -1,6 +1,8 @@
 package dev.sabri.securityjwt.scopes.user;
 
 
+import com.azure.core.annotation.Put;
+import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -44,18 +47,44 @@ public class UserController {
 
     }
 
-    record UpdateUserRequest(String firstName, String lastName, String password) {}
+    record UpdateUserRequest(String firstName, String lastName, String phoneNumber, String password, String address, String postOffice, String district, String country, LocalDateTime dob, Integer ratingBuySellExchange, Integer ratingPetKeeping, Integer ratingVet, String about) {
+
+    }
+
+
 
     @PostMapping
-    public void addUser(@RequestBody NewUserRequest newUserRequest) {
+    public ResponseEntity<String> addUser(@RequestBody NewUserRequest newUserRequest) {
         User user = new User();
         setUserDetails(newUserRequest, user);
+        return ResponseEntity.ok("User added successfully");
     }
 
     @DeleteMapping("/delete/{userId}")
-    public void deleteUser(@PathVariable("userId") String userId) {
+    public ResponseEntity<String> deleteUser(@PathVariable("userId") String userId) {
         userRepository.deleteById(userId);
+        return ResponseEntity.ok("User deleted successfully");
     }
+
+    @PutMapping("/updatePassword/{userId}")
+    public ResponseEntity<String> updatePassword(@PathVariable("userId") String userId, @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        // Check whether the old password is correct
+        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
+        }
+
+        // Encode and update the new password
+        user.setPasswd(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password updated successfully");
+    }
+
 
     @PutMapping("/update/{userId}")
     public ResponseEntity<String> updateUser(@PathVariable("userId") String userId, @RequestBody UpdateUserRequest request) {
@@ -75,9 +104,40 @@ public class UserController {
         if (request.lastName() != null) {
             user.setLastname(request.lastName());
         }
+        if (request.phoneNumber() != null) {
+            user.setPhoneNumber(request.phoneNumber());
+        }
         if (request.password() != null) {
             user.setPasswd(passwordEncoder.encode(request.password()));
         }
+        if (request.address() != null) {
+            user.setAddress(request.address());
+        }
+        if (request.postOffice() != null) {
+            user.setPostOffice(request.postOffice());
+        }
+        if (request.district() != null) {
+            user.setDistrict(request.district());
+        }
+        if (request.country() != null) {
+            user.setCountry(request.country());
+        }
+        if (request.dob() != null) {
+            user.setDateOfBirth(request.dob());
+        }
+        if (request.ratingBuySellExchange() != null) {
+            user.setRatingBuySellExchange(request.ratingBuySellExchange());
+        }
+        if (request.ratingPetKeeping() != null) {
+            user.setRatingPetKeeping(request.ratingPetKeeping());
+        }
+        if (request.ratingVet() != null) {
+            user.setRatingVet(request.ratingVet());
+        }
+        if (request.about() != null) {
+            user.setAbout(request.about());
+        }
+
 
         // Log user details after updating
         System.out.println("After update: " + user);

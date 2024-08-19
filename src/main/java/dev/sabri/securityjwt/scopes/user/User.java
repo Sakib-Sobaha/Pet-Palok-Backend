@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.lang.annotation.Documented;
+import java.time.LocalDateTime;
 import java.util.Collection;
 @Setter
 @Getter
@@ -53,7 +54,7 @@ public class User implements UserDetails {
 
     private String country;
 
-    private String dateOfBirth;
+    private LocalDateTime dateOfBirth;
 
     private Integer ratingBuySellExchange;
 

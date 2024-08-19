@@ -47,7 +47,7 @@ public class PetController {
 
 
 
-//    record NewPetRequest(String name, int age, String type, String breed, String description, Gender gender, boolean vetVerified) {
+//    record NewPetRequest(String name, int age, String type, String breed, String description, Gender, boolean vetVerified) {
 //
 //    }
 

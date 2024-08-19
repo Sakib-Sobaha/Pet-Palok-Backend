@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Setter
@@ -45,7 +46,7 @@ public class Vet implements UserDetails {
 
     private String country;
 
-    private String dateOfBirth;
+    private LocalDateTime dateOfBirth;
 
     private Integer ratingBuySellExchange;
 

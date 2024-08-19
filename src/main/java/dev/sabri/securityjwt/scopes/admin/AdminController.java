@@ -1,10 +1,12 @@
 package dev.sabri.securityjwt.scopes.admin;
 
 
+import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
 import dev.sabri.securityjwt.scopes.seller.Seller;
 import dev.sabri.securityjwt.scopes.seller.SellerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +62,26 @@ public class AdminController {
         adminRepository.deleteById(adminId);
         return ResponseEntity.ok("Admin deleted successfully");
     }
+
+    @PutMapping("/updatePassword/{adminId}")
+    public ResponseEntity<String> updatePassword(@PathVariable("adminId") String adminId, @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        Admin admin = adminRepository.findById(adminId).orElse(null);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin not found");
+        }
+
+        // Check whether the old password is correct
+        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), admin.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
+        }
+
+        // Encode and update the new password
+        admin.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+        adminRepository.save(admin);
+
+        return ResponseEntity.ok("Password updated successfully");
+    }
+
 
     @PutMapping("/update/{adminId}")
     public ResponseEntity<String> updateAdmin(@PathVariable("adminId") String adminId, @RequestBody UpdateAdminRequest updateAdminRequest) {
