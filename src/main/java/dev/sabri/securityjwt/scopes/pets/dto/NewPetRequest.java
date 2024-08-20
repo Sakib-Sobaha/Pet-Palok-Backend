@@ -5,12 +5,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class NewPetRequest {
     public String ownerId;
     public String name;
-    public LocalDateTime dob;
+    public Date dob;
     public String type;
     public String breed;
     public String description;
@@ -22,7 +23,7 @@ public class NewPetRequest {
 
     }
 
-    public NewPetRequest(String ownerId, String name, LocalDateTime dob, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
+    public NewPetRequest(String ownerId, String name, Date dob, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
         this.name = name;
         this.dob = dob;
         this.type = type;

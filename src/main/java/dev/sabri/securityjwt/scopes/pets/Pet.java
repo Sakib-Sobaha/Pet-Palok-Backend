@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 
@@ -50,7 +51,7 @@ public class Pet {
 
     private String description;
 
-    private LocalDateTime dob;
+    private Date dob;
 
     Gender gender;
 
@@ -71,9 +72,10 @@ public class Pet {
 
 
 
-    public Pet(String ownerId, String name, String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
+    public Pet(String ownerId, String name, Date dob,String type, String breed, String description, Gender gender, boolean vetVerified, List<String> images) {
         this.ownerId = ownerId;
         this.name = name;
+        this.dob = dob;
         this.type = type;
         this.breed = breed;
         this.description = description;
