@@ -1,9 +1,7 @@
 package dev.sabri.securityjwt.scopes.user;
 
 
-import com.azure.core.annotation.Put;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
-import dev.sabri.securityjwt.scopes.user.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +31,7 @@ public class UserController {
 
 
     @GetMapping("/whoami")
-    public ResponseEntity<UserDTO> getLoggedInUser(Principal principal) {
+    public ResponseEntity<User> getLoggedInUser(Principal principal) {
         String email = principal.getName();  // Get the logged-in user's email
         User user = userRepository.findByEmail(email).orElse(null);
 
@@ -42,36 +39,11 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-//        return ResponseEntity.ok(user);
-        // Map User entity to UserDTO
-        // Map User entity to UserDTO
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getAddress(),
-                user.getPasswd(),  // Password
-                user.getPostOffice(),
-                user.getDistrict(),
-                user.getCountry(),
-                user.getDateOfBirth(),  // Date of Birth
-                user.getRatingBuySellExchange(),
-                user.getRatingPetKeeping(),
-                user.getRatingVet(),
-                user.getAbout(),
-                user.getImage(),  // Image URL or path
-                user.getGender(),
-                user.getRole()
-        );
-
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/getUserById/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable("userId") String userId) {
-
         return ResponseEntity.ok(userRepository.findUserById(userId));
     }
 
@@ -79,7 +51,7 @@ public class UserController {
 
     }
 
-    record UpdateUserRequest(String firstName, String lastName, String phoneNumber, String password, String address, String postOffice, String district, String country, Date dob, Integer ratingBuySellExchange, Integer ratingPetKeeping, Integer ratingVet, String about) {
+    record UpdateUserRequest(String firstName, String lastName, String phoneNumber,  String address, String postOffice, String district, String country, Date dob, Integer ratingBuySellExchange, Integer ratingPetKeeping, Integer ratingVet, String about, String image, String gender) {
 
     }
 
@@ -91,8 +63,6 @@ public class UserController {
         setUserDetails(newUserRequest, user);
         return ResponseEntity.ok("User added successfully");
     }
-
-
 
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") String userId) {
@@ -141,9 +111,6 @@ public class UserController {
         if (request.phoneNumber() != null) {
             user.setPhoneNumber(request.phoneNumber());
         }
-        if (request.password() != null) {
-            user.setPasswd(passwordEncoder.encode(request.password()));
-        }
         if (request.address() != null) {
             user.setAddress(request.address());
         }
@@ -157,7 +124,7 @@ public class UserController {
             user.setCountry(request.country());
         }
         if (request.dob() != null) {
-            user.setDateOfBirth(request.dob());
+            user.setDob(request.dob());
         }
         if (request.ratingBuySellExchange() != null) {
             user.setRatingBuySellExchange(request.ratingBuySellExchange());
@@ -170,6 +137,18 @@ public class UserController {
         }
         if (request.about() != null) {
             user.setAbout(request.about());
+        }
+        if (request.image() != null) {
+            user.setImage(request.image());
+            System.out.println("New image :) ");
+        }
+        if (request.gender() != null) {
+            if(request.gender().equalsIgnoreCase("male")) {
+                user.setGender( Gender.male);
+            }
+            else if(request.gender().equalsIgnoreCase("female")) {
+                user.setGender( Gender.female);
+            }
         }
 
 
