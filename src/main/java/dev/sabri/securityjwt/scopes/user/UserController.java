@@ -43,6 +43,11 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/getUserById/{userId}")
+    public ResponseEntity<User> getUserById(@PathVariable("userId") String userId) {
+        return ResponseEntity.ok(userRepository.findUserById(userId));
+    }
+
     record NewUserRequest(String firstName, String lastName, String email, String password) {
 
     }
