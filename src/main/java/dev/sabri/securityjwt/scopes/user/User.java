@@ -15,6 +15,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import java.lang.annotation.Documented;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
+
 @Setter
 @Getter
 @Data
@@ -22,16 +24,6 @@ import java.util.Collection;
 
 public class User implements UserDetails {
     @Id
-//    @SequenceGenerator(
-//            name = "user_id_sequence",
-//            sequenceName = "user_id_sequence",
-//            allocationSize = 1
-//    )
-//    @GeneratedValue(
-//            strategy = GenerationType.SEQUENCE,
-//            generator = "user_id_sequence"
-//    )
-
 
     private String id;
 
@@ -54,7 +46,7 @@ public class User implements UserDetails {
 
     private String country;
 
-    private LocalDateTime dateOfBirth;
+    private Date dateOfBirth;
 
     private Integer ratingBuySellExchange;
 

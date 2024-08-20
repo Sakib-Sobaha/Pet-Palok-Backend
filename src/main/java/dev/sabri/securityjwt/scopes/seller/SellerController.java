@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/seller")
@@ -38,6 +39,11 @@ public class SellerController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(seller);
+    }
+
+    @GetMapping("/getSellerById/{sellerId}")
+    public ResponseEntity<Seller> getSellerById(@PathVariable("sellerId") String sellerId) {
+        return ResponseEntity.ok(sellerRepository.findById(sellerId).orElse(null));
     }
 
     record NewSellerRequest(String email, String password) {

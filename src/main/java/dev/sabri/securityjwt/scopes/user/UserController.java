@@ -3,6 +3,7 @@ package dev.sabri.securityjwt.scopes.user;
 
 import com.azure.core.annotation.Put;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
+import dev.sabri.securityjwt.scopes.user.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -32,7 +34,7 @@ public class UserController {
 
 
     @GetMapping("/whoami")
-    public ResponseEntity<User> getLoggedInUser(Principal principal) {
+    public ResponseEntity<UserDTO> getLoggedInUser(Principal principal) {
         String email = principal.getName();  // Get the logged-in user's email
         User user = userRepository.findByEmail(email).orElse(null);
 
@@ -40,11 +42,36 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(user);
+//        return ResponseEntity.ok(user);
+        // Map User entity to UserDTO
+        // Map User entity to UserDTO
+        UserDTO userDTO = new UserDTO(
+                user.getId(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getAddress(),
+                user.getPasswd(),  // Password
+                user.getPostOffice(),
+                user.getDistrict(),
+                user.getCountry(),
+                user.getDateOfBirth(),  // Date of Birth
+                user.getRatingBuySellExchange(),
+                user.getRatingPetKeeping(),
+                user.getRatingVet(),
+                user.getAbout(),
+                user.getImage(),  // Image URL or path
+                user.getGender(),
+                user.getRole()
+        );
+
+        return ResponseEntity.ok(userDTO);
     }
 
     @GetMapping("/getUserById/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable("userId") String userId) {
+
         return ResponseEntity.ok(userRepository.findUserById(userId));
     }
 
@@ -52,7 +79,7 @@ public class UserController {
 
     }
 
-    record UpdateUserRequest(String firstName, String lastName, String phoneNumber, String password, String address, String postOffice, String district, String country, LocalDateTime dob, Integer ratingBuySellExchange, Integer ratingPetKeeping, Integer ratingVet, String about) {
+    record UpdateUserRequest(String firstName, String lastName, String phoneNumber, String password, String address, String postOffice, String district, String country, Date dob, Integer ratingBuySellExchange, Integer ratingPetKeeping, Integer ratingVet, String about) {
 
     }
 

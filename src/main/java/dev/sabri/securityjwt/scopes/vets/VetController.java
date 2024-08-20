@@ -43,6 +43,11 @@ public class VetController {
 
     }
 
+    @GetMapping("/getVetById/{vetId}")
+    public ResponseEntity<Vet> getVetById(@PathVariable String vetId){
+        return ResponseEntity.ok(vetRepository.findById(vetId).orElse(null));
+    }
+
     record NewVetRequest(String email, String password){}
 
     record UpdateVetRequest(String firstName, String lastName, String phoneNumber, String password, String address, String postOffice, String district, String country, LocalDateTime dateOfBirth, String about, String clinic, Gender gender, Role role){

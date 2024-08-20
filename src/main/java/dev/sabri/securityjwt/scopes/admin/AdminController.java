@@ -31,6 +31,11 @@ public class AdminController {
         return adminRepository.findAll();
     }
 
+    @GetMapping("/getAdminById/{adminId}")
+    public ResponseEntity<Admin> getAdminById(@PathVariable("adminId") String adminId) {
+        return ResponseEntity.ok(adminRepository.findById(adminId).orElse(null));
+    }
+
     @GetMapping("/whoami")
     public ResponseEntity<Admin> getLoggedInAdmin(Principal principal) {
         String email = principal.getName();

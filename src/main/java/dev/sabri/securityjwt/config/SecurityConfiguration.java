@@ -66,10 +66,18 @@ public class SecurityConfiguration {
                                 new AntPathRequestMatcher("/error"),
                                 new AntPathRequestMatcher("/favicon.ico"),
                                 new AntPathRequestMatcher("/actuator/*"),
-                                new AntPathRequestMatcher("/api/**"),
-                                new AntPathRequestMatcher("/api/v1/**"),
-                                new AntPathRequestMatcher("/api/v1/auth/*"),
-                                new AntPathRequestMatcher("/api/v1/auth/**"),
+                                new AntPathRequestMatcher("/api/v1/user/register"),
+                                new AntPathRequestMatcher("/api/v1/user/authenticate"),
+                                new AntPathRequestMatcher("/api/v1/admin/register"),
+                                new AntPathRequestMatcher("/api/v1/admin/authenticate"),
+                                new AntPathRequestMatcher("/api/v1/seller/register"),
+                                new AntPathRequestMatcher("/api/v1/seller/authenticate"),
+                                new AntPathRequestMatcher("/api/v1/vet/register"),
+                                new AntPathRequestMatcher("/api/v1/vet/authenticate"),
+//                                new AntPathRequestMatcher("/api/**"),
+//                                new AntPathRequestMatcher("/api/v1/**"),
+//                                new AntPathRequestMatcher("/api/v1/auth/*"),
+//                                new AntPathRequestMatcher("/api/v1/auth/**"),
                                 new AntPathRequestMatcher("http://localhost:3000/**")
                         )
                         .permitAll()
