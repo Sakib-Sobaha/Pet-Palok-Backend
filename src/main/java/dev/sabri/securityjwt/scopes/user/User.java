@@ -1,7 +1,5 @@
 package dev.sabri.securityjwt.scopes.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,7 +51,7 @@ public class User implements UserDetails {
 
     private String country;
 
-    private LocalDateTime dateOfBirth;
+    private Date dob;
 
     private Integer ratingBuySellExchange;
 
