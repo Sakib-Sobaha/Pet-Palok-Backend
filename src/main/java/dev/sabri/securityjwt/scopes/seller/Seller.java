@@ -43,6 +43,7 @@ public class Seller implements UserDetails {
     @Indexed(unique = true)
     private String email;
     private String storeName;
+    private String storeAddress;
     private String slogan;
     private String password;
     private String phone;

@@ -43,6 +43,7 @@ public class SellerController {
 
     @GetMapping("/getSellerById/{sellerId}")
     public ResponseEntity<Seller> getSellerById(@PathVariable("sellerId") String sellerId) {
+        System.out.println("Get seller by id req rcv: sellerID-> " + sellerId);
         return ResponseEntity.ok(sellerRepository.findById(sellerId).orElse(null));
     }
 
@@ -50,7 +51,7 @@ public class SellerController {
 
     }
 
-    record UpdateSellerRequest(String name, String storeName, String slogan, String password, String phone, String address, String info, LocalDateTime dob, Role role) {}
+    record UpdateSellerRequest(String name, String storeName,String storeAddress, String slogan, String password, String phone, String address, String info, LocalDateTime dob, Role role) {}
 
     @PostMapping
     public ResponseEntity<String> addSeller(@RequestBody NewSellerRequest newSellerRequest) {
@@ -103,6 +104,11 @@ public class SellerController {
         if (request.storeName() != null) {
             seller.setStoreName(request.storeName());
         }
+
+        if(request.storeAddress() != null) {
+            seller.setStoreAddress(request.storeAddress());
+        }
+
         if (request.slogan() != null) {
             seller.setSlogan(request.slogan());
         }
