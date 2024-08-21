@@ -1,5 +1,6 @@
 package dev.sabri.securityjwt.scopes.vets;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
 
@@ -81,38 +82,44 @@ public class Vet implements UserDetails {
 
 
 
-
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(role.name());
         //return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
         return passwd;
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return email;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

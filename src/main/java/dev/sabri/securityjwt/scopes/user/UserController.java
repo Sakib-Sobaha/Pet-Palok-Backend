@@ -51,7 +51,7 @@ public class UserController {
 
     }
 
-    record UpdateUserRequest(String firstName, String lastName, String phoneNumber,  String address, String postOffice, String district, String country, Date dob, Integer ratingBuySellExchange, Integer ratingPetKeeping, Integer ratingVet, String about, String image, String gender) {
+    record UpdateUserRequest(String firstName, String lastName, String phoneNumber,  String address, String postOffice, String district, String country, Date dob,  String about, String image, String gender) {
 
     }
 
@@ -83,7 +83,7 @@ public class UserController {
         }
 
         // Encode and update the new password
-        user.setPasswd(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
         userRepository.save(user);
 
         return ResponseEntity.ok("Password updated successfully");
@@ -126,15 +126,6 @@ public class UserController {
         if (request.dob() != null) {
             user.setDob(request.dob());
         }
-        if (request.ratingBuySellExchange() != null) {
-            user.setRatingBuySellExchange(request.ratingBuySellExchange());
-        }
-        if (request.ratingPetKeeping() != null) {
-            user.setRatingPetKeeping(request.ratingPetKeeping());
-        }
-        if (request.ratingVet() != null) {
-            user.setRatingVet(request.ratingVet());
-        }
         if (request.about() != null) {
             user.setAbout(request.about());
         }
@@ -170,6 +161,6 @@ public class UserController {
         user.setFirstname(newUserRequest.firstName);
         user.setLastname(newUserRequest.lastName);
         user.setEmail(newUserRequest.email);
-        user.setPasswd(newUserRequest.password);
+        user.setPassword(newUserRequest.password);
     }
 }

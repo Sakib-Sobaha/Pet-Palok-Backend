@@ -1,5 +1,6 @@
 package dev.sabri.securityjwt.scopes.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,15 +20,6 @@ import java.util.Collection;
 
 public class User implements UserDetails {
     @Id
-//    @SequenceGenerator(
-//            name = "user_id_sequence",
-//            sequenceName = "user_id_sequence",
-//            allocationSize = 1
-//    )
-//    @GeneratedValue(
-//            strategy = GenerationType.SEQUENCE,
-//            generator = "user_id_sequence"
-//    )
 
 
     private String id;
@@ -41,7 +33,7 @@ public class User implements UserDetails {
 
     private String phoneNumber;
 
-    private String passwd;
+    private String password;
 
     private String address;
 
@@ -53,10 +45,10 @@ public class User implements UserDetails {
 
     private Date dob;
 
-    private Integer ratingBuySellExchange;
+    private double ratingBuySellExchange;
 
-    private Integer ratingPetKeeping;
-    private Integer ratingVet;
+    private double ratingPetKeeping;
+    private double ratingVet;
     private String about;
 
     private String image;
@@ -73,20 +65,20 @@ public class User implements UserDetails {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.passwd = passwd;
+        this.password = passwd;
         this.role = role;
     }
 
     public User(String id,String firstname, String lastname, String passwd) {
         this.firstname = firstname;
         this.lastname = lastname;
-        this.passwd = passwd;
+        this.password = passwd;
     }
 
     public User(String id, String email, String passwd, Role role) {
         this.id = id;
         this.email = email;
-        this.passwd = passwd;
+        this.password = passwd;
         this.role = role;
 
     }
@@ -95,42 +87,49 @@ public class User implements UserDetails {
 
 
 
-//    @JsonIgnore
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(role.name());
         //return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
-        return passwd;
+        return password;
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return email;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;
     }
+
 
     @Override
     public String toString() {
@@ -139,7 +138,7 @@ public class User implements UserDetails {
                 ", lastName='" + lastname + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phoneNumber + '\'' +
-                ", password='" + passwd + '\'' +
+                ", password='" + password + '\'' +
                 ", address='" + address + '\'' +
                 ", postOffice='" + postOffice + '\'' +
                 ", district='" + district + '\'' +
