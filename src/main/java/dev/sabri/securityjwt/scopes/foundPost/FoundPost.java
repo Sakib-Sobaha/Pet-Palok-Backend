@@ -48,10 +48,10 @@ public class FoundPost {
 
     @Override
     public String toString() {
-        System.out.println(
+        return
                 this.authorId + "\t" + this.type + "\t" + this.date_found + "\t" + this.location_found + "\t"
-                + this.description + "\t" + this.images + "\t" + this.condition + "\t";
-        );
+                + this.description + "\t" + this.images + "\t" + this.condition + "\t"
+        ;
     }
 }
 
