@@ -1,11 +1,9 @@
 package dev.sabri.securityjwt.scopes.vets;
 
 
-import com.azure.core.annotation.Get;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
 import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
-import dev.sabri.securityjwt.scopes.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,7 @@ public class VetController {
     private final VetRepository vetRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping
+    @GetMapping("/getVets")
     public List<Vet> getAllVets(){
         return vetService.getAll();
     }
@@ -50,7 +49,7 @@ public class VetController {
 
     record NewVetRequest(String email, String password){}
 
-    record UpdateVetRequest(String firstName, String lastName, String phoneNumber, String password, String address, String postOffice, String district, String country, LocalDateTime dateOfBirth, String about, String clinic, Gender gender, Role role){
+    record UpdateVetRequest(String firstname, String lastname, String phone, String clinic_name, String clinic_address, String address, String postOffice, String district, String country, Date dob, double rating_vetvisit, String about, String image, Gender gender, Role role){
 
     }
 
@@ -58,7 +57,7 @@ public class VetController {
     public ResponseEntity<String> addVet(@RequestBody NewVetRequest newVetRequest){
         Vet vet = new Vet();
         vet.setEmail(newVetRequest.email);
-        vet.setPasswd(passwordEncoder.encode(newVetRequest.password));
+        vet.setPassword(passwordEncoder.encode(newVetRequest.password));
         vetRepository.save(vet);
         return ResponseEntity.ok("Vet added successfully");
     }
@@ -82,7 +81,7 @@ public class VetController {
         }
 
         // Encode and update the new password
-        vet.setPasswd(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
+        vet.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
         vetRepository.save(vet);
 
         return ResponseEntity.ok("Password updated successfully");
@@ -99,19 +98,21 @@ public class VetController {
         System.out.println("Before update: " + vet);
 
         // Update only the fields that are present in the request
-        if (request.firstName() != null) {
-            vet.setFirstname(request.firstName());
+        if (request.firstname() != null) {
+            vet.setFirstname(request.firstname());
         }
 
-        if (request.lastName() != null) {
-            vet.setLastname(request.lastName());
+        if (request.lastname() != null) {
+            vet.setLastname(request.lastname());
         }
-        if(request.phoneNumber() != null) {
-            vet.setPhoneNumber(request.phoneNumber());
+        if(request.phone() != null) {
+            vet.setPhone(request.phone());
         }
-
-        if (request.password() != null) {
-            vet.setPasswd(passwordEncoder.encode(request.password()));
+        if(request.clinic_name() != null){
+            vet.setClinic_name(request.clinic_name());
+        }
+        if(request.clinic_address() != null){
+            vet.setClinic_address(request.clinic_address());
         }
         if (request.address() != null) {
             vet.setAddress(request.address());
@@ -125,14 +126,17 @@ public class VetController {
         if (request.country() != null) {
             vet.setCountry(request.country());
         }
-        if (request.dateOfBirth() != null) {
-            vet.setDateOfBirth(request.dateOfBirth());
+        if (request.dob() != null) {
+            vet.setDob(request.dob());
+        }
+        if(request.rating_vetvisit() > 0){
+            vet.setRating_vetvisit(request.rating_vetvisit());
         }
         if (request.about() != null) {
             vet.setAbout(request.about());
         }
-        if (request.clinic() != null) {
-            vet.setClinic(request.clinic());
+        if(request.image() != null) {
+            vet.setImage(request.image());
         }
         if(request.gender() != null){
             vet.setGender(request.gender());
@@ -149,7 +153,7 @@ public class VetController {
 
         // Fetch the user again to verify if the update was applied
         Vet updatedVet = vetRepository.findById(vetId).orElse(null);
-        System.out.println("Updated user from DB: " + updatedVet);
+        System.out.println("Updated vet from DB: " + updatedVet);
 
         return ResponseEntity.ok("Vet updated successfully");
     }

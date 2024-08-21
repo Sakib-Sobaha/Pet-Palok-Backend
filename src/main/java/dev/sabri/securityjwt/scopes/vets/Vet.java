@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,14 +15,14 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.mongodb.core.index.Indexed;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 @Setter
 @Getter
 @Data
 @Document(collection = "_vet")
-
+@AllArgsConstructor
 public class Vet implements UserDetails {
     @Id
 
@@ -36,8 +37,12 @@ public class Vet implements UserDetails {
     @Indexed(unique = true)
     private String email;
 
-    private String phoneNumber;
-    private String passwd;
+    private String phone;
+    private String password;
+
+    private String clinic_name;
+
+    private String clinic_address;
 
     private String address;
 
@@ -47,13 +52,13 @@ public class Vet implements UserDetails {
 
     private String country;
 
-    private LocalDateTime dateOfBirth;
+    private Date dob;
 
-    private Integer ratingBuySellExchange;
+    private double rating_vetvisit;
 
     private String about;
 
-    private String clinic;
+
 
     private String image;
 
@@ -69,14 +74,14 @@ public class Vet implements UserDetails {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.passwd = passwd;
+        this.password = passwd;
         this.role = role;
     }
 
     public Vet(String id, String email, String passwd, Role role) {
         this.id = id;
         this.email = email;
-        this.passwd = passwd;
+        this.password = passwd;
         this.role = role;
     }
 
@@ -92,7 +97,7 @@ public class Vet implements UserDetails {
     @JsonIgnore
     @Override
     public String getPassword() {
-        return passwd;
+        return password;
     }
 
     @JsonIgnore
@@ -128,20 +133,20 @@ public class Vet implements UserDetails {
     @Override
     public String toString() {
         return "User{" +
-                "firstName='" + firstname + '\'' +
-                ", lastName='" + lastname + '\'' +
+                "firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
                 ", email='" + email + '\'' +
-                ", phone='" + phoneNumber + '\'' +
-                ", password='" + passwd + '\'' +
-                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", password='" + password + '\'' +
+                ", address='" + clinic_address + '\'' +
                 ", postOffice='" + postOffice + '\'' +
                 ", district='" + district + '\'' +
                 ", country='" + country + '\'' +
                 ", DOB='" +  + '\'' +
                 ", gender='" + gender + '\'' +
                 ", about='" + about + '\'' +
-                ", ratingBuySellExch=" + ratingBuySellExchange +
-                ", clinic=" + clinic +
+                ", ratingBuySellExch=" + rating_vetvisit +
+                ", clinic=" + clinic_name +
                 ", ratingVet=" +
                 '}';
     }
