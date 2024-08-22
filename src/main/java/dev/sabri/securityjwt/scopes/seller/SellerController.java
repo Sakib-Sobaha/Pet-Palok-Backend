@@ -118,8 +118,8 @@ public class SellerController {
         if(request.address() != null) {
             seller.setAddress(request.address());
         }
-        if(request.info() != null) {
-            seller.setAbout(request.info());
+        if(request.about() != null) {
+            seller.setAbout(request.about());
         }
         if(request.dob() != null) {
             seller.setDob(request.dob());
