@@ -1,6 +1,6 @@
 package dev.sabri.securityjwt.scopes.foundPost;
 
-import dev.sabri.securityjwt.scopes.pets.Type;
+import dev.sabri.securityjwt.scopes.pets.PetType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +20,7 @@ public class FoundPost {
     @Id
     private String id;
     private String authorId; // user id who posted
-    private Type type;
+    private PetType type;
     private Date date_found;
     private String location_found;
     private String description;
@@ -32,7 +32,7 @@ public class FoundPost {
     private ConfirmationStatus confirmationStatus;
 
 
-    public FoundPost(String authorId, Type type, Date date_found, String location_found, String description, String[] images, Condition condition, String contactNo, String location_return, String appearance_breed, ConfirmationStatus confirmationStatus) {
+    public FoundPost(String authorId, PetType type, Date date_found, String location_found, String description, String[] images, Condition condition, String contactNo, String location_return, String appearance_breed, ConfirmationStatus confirmationStatus) {
         this.authorId = authorId;
         this.type = type;
         this.date_found = date_found;

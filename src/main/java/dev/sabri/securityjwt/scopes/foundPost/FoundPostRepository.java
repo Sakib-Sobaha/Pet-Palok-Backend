@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface FoundPostRepository {
     Optional<FoundPost> findById(String id);
     Optional<List<FoundPost>> findAll();
+    Optional<List<FoundPost>> findByAuthorId(String title);
+
 }

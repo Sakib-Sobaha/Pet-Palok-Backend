@@ -1,25 +1,16 @@
-package dev.sabri.securityjwt.scopes.seller;
-
-
+package dev.sabri.securityjwt.scopes.seller.dto;
 
 import dev.sabri.securityjwt.scopes.pets.PetType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
-@Document(collection = "_marketItems")
-
-
-public class MarketItems {
-    @Id
-
+public class MarketItemsDTO {
     private String id;
     private String sellerId;
     private String name;
@@ -28,8 +19,7 @@ public class MarketItems {
     private Integer totalAvailableCount;
     private Float rating;
     private Float pricePerUnit;
-    private ProductType type;
-    private PetType petType;
-    private String [] images;
-
+    private String type;  // String representation of ProductType
+    private String petType;  // String representation of PetType
+    private String[] images;
 }
