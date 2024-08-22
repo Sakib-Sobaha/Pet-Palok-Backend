@@ -3,6 +3,7 @@ package dev.sabri.securityjwt.scopes.seller;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +16,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,10 +49,14 @@ public class Seller implements UserDetails {
     private String password;
     private String phone;
     private String address;
-    private String info;
-    private LocalDateTime dob;
+    private String postOffice;
+    private String district;
+    private String country;
+    private String about;
+    private Date dob;
     private String image;
     Role role;
+    Gender gender;
 //    List<String> items = new ArrayList<String>();
 
     public Seller(String id, String email, String passwd, Role role) {

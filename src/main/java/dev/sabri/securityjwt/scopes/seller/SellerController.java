@@ -2,8 +2,8 @@ package dev.sabri.securityjwt.scopes.seller;
 
 
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
+import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
-import dev.sabri.securityjwt.scopes.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,9 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/seller")
@@ -51,7 +50,7 @@ public class SellerController {
 
     }
 
-    record UpdateSellerRequest(String name, String storeName,String storeAddress, String slogan, String password, String phone, String address, String info, LocalDateTime dob, Role role) {}
+    record UpdateSellerRequest(String name, String storeName, String storeAddress, String slogan, String phone, String address, String postOffice, String district, String country, String about, Date dob, String image,Role role, String gender) {}
 
     @PostMapping
     public ResponseEntity<String> addSeller(@RequestBody NewSellerRequest newSellerRequest) {
@@ -112,9 +111,7 @@ public class SellerController {
         if (request.slogan() != null) {
             seller.setSlogan(request.slogan());
         }
-        if (request.password() != null) {
-            seller.setPassword(passwordEncoder.encode(request.password()));
-        }
+
         if(request.phone() != null) {
             seller.setPhone(request.phone());
         }
@@ -122,7 +119,24 @@ public class SellerController {
             seller.setAddress(request.address());
         }
         if(request.info() != null) {
-            seller.setInfo(request.info());
+            seller.setAbout(request.info());
+        }
+        if(request.dob() != null) {
+            seller.setDob(request.dob());
+        }
+        if(request.image() != null){
+            seller.setImage(request.image());
+        }
+        if(request.role() != null) {
+            seller.setRole(request.role());
+        }
+        if (request.gender() != null) {
+            if(request.gender().equalsIgnoreCase("male")) {
+                seller.setGender( Gender.male);
+            }
+            else if(request.gender().equalsIgnoreCase("female")) {
+                seller.setGender( Gender.female);
+            }
         }
 
 
@@ -134,9 +148,9 @@ public class SellerController {
 
         // Fetch the user again to verify if the update was applied
         Seller updatedSeller = sellerService.findSellerById(sellerId);
-        System.out.println("Updated user from DB: " + updatedSeller);
+        System.out.println("Updated seller from DB: " + updatedSeller);
 
-        return ResponseEntity.ok("User updated successfully");
+        return ResponseEntity.ok("Seller updated successfully");
     }
 
 
