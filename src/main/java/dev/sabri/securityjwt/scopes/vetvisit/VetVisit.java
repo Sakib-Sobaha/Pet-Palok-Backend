@@ -2,8 +2,6 @@ package dev.sabri.securityjwt.scopes.vetvisit;
 
 
 import dev.sabri.securityjwt.entity.File;
-import dev.sabri.securityjwt.scopes.user.Gender;
-import dev.sabri.securityjwt.scopes.user.Role;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @Document(collection = "vetVisit")
 
-public class vetVisit {
+public class VetVisit {
     @Id
 
 
