@@ -28,16 +28,6 @@ import java.util.Date;
 public class Seller implements UserDetails {
 
     @Id
-//    @SequenceGenerator(
-//            name = "seller_id_sequence",
-//            sequenceName = "seller_id_sequence",
-//            allocationSize = 1
-//    )
-//    @GeneratedValue(
-//            strategy = GenerationType.SEQUENCE,
-//            generator = "seller_id_sequence"
-//    )
-
 
     private String id;
     private String name;
@@ -55,6 +45,7 @@ public class Seller implements UserDetails {
     private String about;
     private Date dob;
     private String image;
+    private String rating;
     Role role;
     Gender gender;
 //    List<String> items = new ArrayList<String>();

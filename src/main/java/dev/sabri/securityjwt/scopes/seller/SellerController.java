@@ -127,6 +127,15 @@ public class SellerController {
         if(request.image() != null){
             seller.setImage(request.image());
         }
+        if(request.postOffice() != null) {
+            seller.setPostOffice(request.postOffice());
+        }
+        if(request.district() != null) {
+            seller.setDistrict(request.district());
+        }
+        if(request.country() != null) {
+            seller.setCountry(request.country());
+        }
         if(request.role() != null) {
             seller.setRole(request.role());
         }
