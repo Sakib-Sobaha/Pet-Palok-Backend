@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Timer;
+
 
 @Setter
 @Getter
@@ -25,7 +25,7 @@ public class AppointmentRequest {
     private String petId;
     private Date request_date;
     private Date booking_date;
-    private Timer booking_time;
+    private Date booking_time;
     private String description;
     private String status;
     private String medium;
