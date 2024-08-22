@@ -46,6 +46,10 @@ public class MarketItemsController {
             return ResponseEntity.noContent().build();
         }
 
+        for (MarketItemsDTO dto : itemDTOs) {
+            System.out.println(itemDTOs);
+        }
+
         // Return the list of DTOs as a JSON response
         return ResponseEntity.ok(itemDTOs);
     }
@@ -83,28 +87,20 @@ public class MarketItemsController {
         return ResponseEntity.ok(marketItem);
     }
 
-    // Helper methods for enum conversion with normalization
+    // Helper methods for enum conversion without normalization
     private ProductType convertToProductType(String type) {
         try {
-            return ProductType.valueOf(capitalizeFirstLetter(type));
+            return ProductType.valueOf(type.toUpperCase()); // Convert to uppercase
         } catch (IllegalArgumentException e) {
-            return ProductType.Others; // Default value if input doesn't match any enum constant
+            return ProductType.OTHERS; // Default value if input doesn't match any enum constant
         }
     }
 
     private PetType convertToPetType(String petType) {
         try {
-            return PetType.valueOf(capitalizeFirstLetter(petType));
+            return PetType.valueOf(petType.toUpperCase()); // Convert to uppercase
         } catch (IllegalArgumentException e) {
-            return PetType.Others; // Default value if input doesn't match any enum constant
+            return PetType.OTHERS; // Default value if input doesn't match any enum constant
         }
-    }
-
-    // Utility method to capitalize the first letter
-    private String capitalizeFirstLetter(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 }
