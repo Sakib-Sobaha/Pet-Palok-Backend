@@ -32,4 +32,13 @@ public class MarketItems {
     private PetType petType;
     private String [] images;
 
+    @Override
+    public String toString() {
+        String s = (this.name + " " + this.description) +
+        ("sellerId: " + this.sellerId + " price: " + this.pricePerUnit + " rating: " + this.rating) +
+        "pettype: " + this.petType + " product type: " + this.type;
+
+        return s;
+    }
+
 }

@@ -46,16 +46,17 @@ public class MarketItemsController {
             return ResponseEntity.noContent().build();
         }
 
-        for (MarketItemsDTO dto : itemDTOs) {
-            System.out.println(itemDTOs);
-        }
+//        for (MarketItemsDTO dto : itemDTOs) {
+//            System.out.println(itemDTOs);
+//        }
 
         // Return the list of DTOs as a JSON response
         return ResponseEntity.ok(itemDTOs);
     }
 
-    @GetMapping("/getItemsBySellerId")
-    public ResponseEntity<Optional<List<MarketItems>>> getItemsBySellerId(@RequestParam("sellerId") String sellerId) {
+    @GetMapping("/getItemsBySellerId/{sellerId}")
+    public ResponseEntity<Optional<List<MarketItems>>> getItemsBySellerId(@PathVariable("sellerId") String sellerId) {
+        System.out.println("Received by sellerId: " + sellerId);
         return ResponseEntity.ok(marketItemsRepository.findBySellerId(sellerId));
     }
 
@@ -68,19 +69,36 @@ public class MarketItemsController {
 
         MarketItems marketItem = new MarketItems();
 
-        marketItem.setSellerId(newMarketItem.sellerId);
-        marketItem.setName(newMarketItem.name);
-        marketItem.setQuantity(newMarketItem.quantity);
-        marketItem.setPricePerUnit(newMarketItem.pricePerUnit);
-        marketItem.setTotalAvailableCount(newMarketItem.totalAvailableCount);
+        if(newMarketItem.sellerId != null)
+            marketItem.setSellerId(newMarketItem.sellerId);
+        if(newMarketItem.name != null)
+            marketItem.setName(newMarketItem.name);
+        if(newMarketItem.quantity != null)
+            marketItem.setQuantity(newMarketItem.quantity);
+        if(newMarketItem.pricePerUnit != null)
+            marketItem.setPricePerUnit(newMarketItem.pricePerUnit);
+        if(newMarketItem.totalAvailableCount != null)
+            marketItem.setTotalAvailableCount(newMarketItem.totalAvailableCount);
+
         marketItem.setRating(0f);
 
         // Handle type normalization and enum mapping
-        marketItem.setType(convertToProductType(newMarketItem.type));
-        marketItem.setPetType(convertToPetType(newMarketItem.petType));
+        if(newMarketItem.type != null)
+            marketItem.setType(convertToProductType(newMarketItem.type));
+        else
+            marketItem.setType((ProductType.OTHERS));
 
-        marketItem.setDescription(newMarketItem.description);
-        marketItem.setImages(newMarketItem.images);
+        if(newMarketItem.petType != null)
+            marketItem.setPetType(convertToPetType(newMarketItem.petType));
+        else
+            marketItem.setPetType((PetType.OTHERS));
+
+        if(newMarketItem.description != null)
+            marketItem.setDescription(newMarketItem.description);
+
+        if(newMarketItem.images != null)
+            marketItem.setImages(newMarketItem.images);
+
 
         marketItemsRepository.save(marketItem);
         System.out.println("Added new market item: " + marketItem.toString());
