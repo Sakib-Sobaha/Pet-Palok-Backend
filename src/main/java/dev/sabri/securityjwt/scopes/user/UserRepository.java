@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.Optional;
 
-@EnableMongoRepositories(basePackageClasses = UserRepository.class)
+
 public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmail(String email);
     //    User findByEmail(String email);

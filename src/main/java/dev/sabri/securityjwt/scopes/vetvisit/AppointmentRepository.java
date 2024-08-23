@@ -7,12 +7,12 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import java.util.List;
 
 @EnableMongoRepositories(basePackageClasses = AppointmentRepository.class)
-public interface AppointmentRepository extends MongoRepository<appointmentRequest, String> {
-    List<appointmentRequest> findByUserId(String userId);
-    List<appointmentRequest> findByUserIdAndAppointmentId(String userId, String appointmentId);
-    List<appointmentRequest> findByAppointmentId(String appointmentId);
-    List<appointmentRequest> findByVetId(String vetId);
-    List<appointmentRequest> findByVetIdAndAppointmentId(String vetId, String appointmentId);
+public interface AppointmentRepository extends MongoRepository<AppointmentRequest, String> {
+    List<AppointmentRequest> findByUserId(String userId);
+    List<AppointmentRequest> findByUserIdAndAppointmentId(String userId, String appointmentId);
+    List<AppointmentRequest> findByAppointmentId(String appointmentId);
+    List<AppointmentRequest> findByVetId(String vetId);
+    List<AppointmentRequest> findByVetIdAndAppointmentId(String vetId, String appointmentId);
 
-    List<appointmentRequest> findByVetIdAndUserId(String vetId, String userId);
+    List<AppointmentRequest> findByVetIdAndUserId(String vetId, String userId);
 }
