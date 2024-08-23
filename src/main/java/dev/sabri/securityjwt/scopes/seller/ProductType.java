@@ -1,8 +1,7 @@
 package dev.sabri.securityjwt.scopes.seller;
 public enum ProductType {
     ACCESSORIES,
-    TOYS,
+    MEDICINE,
     FOOD,
     OTHERS
-    // other types
 }

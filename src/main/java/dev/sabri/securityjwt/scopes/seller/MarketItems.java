@@ -34,7 +34,7 @@ public class MarketItems {
 
     @Override
     public String toString() {
-        String s = (this.name + " " + this.description) +
+        String s = (this.name + " ") +
         ("sellerId: " + this.sellerId + " price: " + this.pricePerUnit + " rating: " + this.rating) +
         "pettype: " + this.petType + " product type: " + this.type;
 

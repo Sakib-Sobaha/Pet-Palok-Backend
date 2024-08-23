@@ -4,6 +4,7 @@ import dev.sabri.securityjwt.scopes.pets.PetType;
 import dev.sabri.securityjwt.scopes.seller.dto.MarketItemsDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,7 +66,7 @@ public class MarketItemsController {
 
     @PostMapping("/addNewItem")
     public ResponseEntity<MarketItems> addNewItem(@RequestBody NewMarketItem newMarketItem) {
-        System.out.println("Received create market item request");
+        System.out.println("Received create market item request: type: "+newMarketItem.type + " petType: "+newMarketItem.petType + " description: "+newMarketItem.description);
 
         MarketItems marketItem = new MarketItems();
 
@@ -121,4 +122,39 @@ public class MarketItemsController {
             return PetType.OTHERS; // Default value if input doesn't match any enum constant
         }
     }
+
+    @GetMapping("/item/{itemId}")
+    public ResponseEntity<MarketItems> getItem(@PathVariable("itemId") String itemId) {
+        MarketItems item = marketItemsRepository.findById(itemId).orElse(null);
+
+        if(item == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.ok((item));
+    }
+
+    @DeleteMapping("/deleteItem/{itemId}")
+    public ResponseEntity<String> deleteItem(@PathVariable("itemId") String itemId) {
+        System.out.println("Received delete market item request: " + itemId);
+        try {
+            // Find the item by itemId
+            Optional<MarketItems> item = marketItemsRepository.findById(itemId);
+            System.out.println("item found: " + item.toString());
+
+            // Check if the item exists in the database
+            if (item.isPresent()) {
+                marketItemsRepository.deleteById(itemId); // Delete the item if it exists
+                return ResponseEntity.ok("Item deleted successfully");
+            } else {
+                // Return a 404 Not Found if the item does not exist
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item not found");
+            }
+        } catch (Exception e) {
+            // Handle any unexpected exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while deleting the item: " + e.getMessage());
+        }
+    }
+
+
 }
