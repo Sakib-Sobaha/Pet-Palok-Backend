@@ -102,6 +102,8 @@ public record AuthenticationService(UserRepository userRepository,
         );
         final var user = userRepository.findByEmail(request.email()).orElseThrow();
         final var token = JwtService.generateToken(user);
+        user.setStatus("online");
+        userRepository.save(user);
         return new AuthenticationResponse(token);
 
     }
