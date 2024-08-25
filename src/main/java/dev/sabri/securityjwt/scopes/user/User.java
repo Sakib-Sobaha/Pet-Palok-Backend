@@ -53,6 +53,8 @@ public class User implements UserDetails {
 
     private String image;
 
+    private String status;
+
     Gender gender;
 
     Role role = Role.USER;

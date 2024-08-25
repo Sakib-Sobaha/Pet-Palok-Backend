@@ -29,6 +29,7 @@ public class AppointmentRequest {
     private String description;
     private String status;
     private String medium;
+    private String prescription;
 
     @Indexed(unique = true)
     private String appointmentId;
