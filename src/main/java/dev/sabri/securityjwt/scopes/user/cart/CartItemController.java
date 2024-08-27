@@ -89,6 +89,29 @@ public class CartItemController {
         return ResponseEntity.notFound().build();
     }
 
+    @DeleteMapping("/clearCart")
+    public ResponseEntity<String> clearCart(Principal principal) {
+
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        assert user != null;
+        Optional<List<CartItem>> list =  cartItemRepository.findByUserId(user.getId());
+        if (list.isPresent()) {
+            for(CartItem cartItem : list.get()) {
+                System.out.println("deleting cartItem: " + cartItem.getId());
+                cartItemRepository.deleteById(cartItem.getId());
+
+            }
+            System.out.println("cart items deleted successfully");
+            return ResponseEntity.ok("Cart cleared successfully");
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+
+
     @PostMapping("/addToCart")
     public ResponseEntity<Optional<CartItem>> addToCart(@RequestBody NewCartItem newCartItem, Principal principal) {
         System.out.println("Received request for add to cart:");
