@@ -128,6 +128,8 @@ public record AuthenticationService(UserRepository userRepository,
         );
         final var vet = vetRepository.findByEmail(request.email()).orElseThrow();
         final var token = JwtService.generateToken(vet);
+        vet.setStatus("online");
+        vetRepository.save(vet);
         return new AuthenticationResponse(token);
 
     }
