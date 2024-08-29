@@ -1,6 +1,7 @@
 package dev.sabri.securityjwt.scopes.seller.order;
 
 import java.util.Date;
+
 import dev.sabri.securityjwt.scopes.seller.MarketItems;
 import dev.sabri.securityjwt.scopes.seller.MarketItemsRepository;
 import dev.sabri.securityjwt.scopes.seller.Seller;
@@ -36,7 +37,7 @@ public class OrderController {
     private MarketItemsRepository marketItemsRepository;
 
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private SellerRepository sellerRepository;
@@ -54,8 +55,7 @@ public class OrderController {
 
 
             return ResponseEntity.ok(Optional.of(orders));
-        }
-        else {
+        } else {
             return ResponseEntity.notFound().build();
         }
 
@@ -86,8 +86,67 @@ public class OrderController {
 
     }
 
-    record NewOrder (List<String> cartItemIds, String name, String email, String phone, String alternatePhone, String address, String postOffice, String district, String country, Float deliveryFee){
+    record NewOrder(List<String> cartItemIds, String name, String email, String phone, String alternatePhone,
+                    String address, String postOffice, String district, String country, Float deliveryFee) {
 
+    }
+
+    @GetMapping("/accept/{orderId}")
+    public ResponseEntity<Optional<Order>> acceptOrder(@PathVariable String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent() && order.get().getStatus() == OrderStatus.PENDING) {
+            Order orderToAccept = order.get();
+            orderToAccept.setStatus(OrderStatus.ACCEPTED);
+            orderRepository.save(orderToAccept);
+
+            System.out.println("Accepted order" + orderId);
+
+            return ResponseEntity.ok(Optional.of(orderToAccept));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/reject/{orderId}")
+    public ResponseEntity<Optional<Order>> rejectOrder(@PathVariable String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent() && order.get().getStatus() == OrderStatus.PENDING) {
+            Order orderToReject = order.get();
+            orderToReject.setStatus(OrderStatus.REJECTED);
+            orderRepository.save(orderToReject);
+
+            return ResponseEntity.ok(Optional.of(orderToReject));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/outForDelivery/{orderId}")
+    public ResponseEntity<Optional<Order>> outForDeliveryOrder(@PathVariable String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent() && order.get().getStatus() == OrderStatus.ACCEPTED) {
+            Order order1 = order.get();
+            order1.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+            orderRepository.save(order1);
+
+            return ResponseEntity.ok(Optional.of(order1));
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/delivered/{orderId}")
+    public ResponseEntity<Optional<Order>> deliveredOrder(@PathVariable String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent() && order.get().getStatus() == OrderStatus.OUT_FOR_DELIVERY) {
+            Order order1 = order.get();
+            order1.setStatus(OrderStatus.DELIVERED);
+            orderRepository.save(order1);
+
+            return ResponseEntity.ok(Optional.of(order1));
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/createOrder")
@@ -100,24 +159,22 @@ public class OrderController {
         // Fetch the user based on the email
         User user = userRepository.findByEmail(email).orElse(null);
 
-        if(user == null){
+        if (user == null) {
             System.out.println("user not found");
             return ResponseEntity.notFound().build();
-        }
-        else
-        {
+        } else {
             // check valid uid or not
             List<String> cartItemIdsCheck = newOrder.cartItemIds;
             CartItem cartItem = cartItemRepository.findById(cartItemIdsCheck.get(0)).orElse(null);
-            if(cartItem == null){
+            if (cartItem == null) {
                 System.out.println("cartItem not found");
                 return ResponseEntity.notFound().build();
-            }else if(!cartItem.getUserId().equals(user.getId())){
+            } else if (!cartItem.getUserId().equals(user.getId())) {
                 System.out.println("userId: " + user.getId());
                 System.out.println("CartItem UserID: " + cartItem.getUserId());
                 System.out.println("cannot place order for other user huh :3");
                 return ResponseEntity.badRequest().build();
-            }else {
+            } else {
                 System.out.println("All ok. initiating new order");
                 Order order = new Order();
 
@@ -135,18 +192,18 @@ public class OrderController {
 
                 // set the current time as ordered time and date
                 Date date = new Date(new java.util.Date().getTime());
-                System.out.println("ordering on : "+date);
+                System.out.println("ordering on : " + date);
                 order.setOrderedOn(date);
+                order.setStatus(OrderStatus.PENDING);
+                System.out.println(order.getStatus());
 
                 HashMap<String, Integer> itemCountMap = new HashMap<>();
-                for(String id : newOrder.cartItemIds){
+                for (String id : newOrder.cartItemIds) {
                     CartItem cartItemTemp = cartItemRepository.findById(id).orElse(null);
-                    if(cartItemTemp == null){
+                    if (cartItemTemp == null) {
                         System.out.println("cart item not found");
                         return ResponseEntity.notFound().build();
-                    }
-                    else
-                    {
+                    } else {
                         String marketItemId = cartItemTemp.getItemId();
                         Integer count = cartItemTemp.getCount();
 
@@ -159,7 +216,7 @@ public class OrderController {
 
                 orderRepository.save(order);
 
-                System.out.println("order created: "+ order);
+                System.out.println("order created: " + order);
                 // time to delete the cartItems
 
 //                cartItemRepository.deleteAllById(newOrder.cartItemIds);
@@ -167,6 +224,47 @@ public class OrderController {
                 return ResponseEntity.ok(order);
             }
 
+        }
+    }
+
+    private OrderStatus convertStringToOrderStatus(String orderStatus) {
+        switch (orderStatus.toLowerCase()) {
+            case "delivered":
+                return OrderStatus.DELIVERED;
+            case "pending":
+                return OrderStatus.PENDING;
+            case "accepted":
+                return OrderStatus.ACCEPTED;
+            case "rejected":
+                return OrderStatus.REJECTED;
+            case "out for delivery":
+                return OrderStatus.OUT_FOR_DELIVERY;
+            default:
+                return OrderStatus.UNIDENTIFIED;
+        }
+    }
+
+    private String convertStatusToString(OrderStatus orderStatus) {
+        switch (orderStatus) {
+            case OUT_FOR_DELIVERY -> {
+                return "Out for delivery";
+            }
+            case ACCEPTED -> {
+                return "Accepted";
+            }
+            case REJECTED -> {
+                return "Rejected";
+            }
+            case PENDING -> {
+                return "Pending";
+            }
+            case DELIVERED -> {
+                return "Delivered";
+            }
+            default ->
+            {
+                return "Unidentified";
+            }
         }
     }
 

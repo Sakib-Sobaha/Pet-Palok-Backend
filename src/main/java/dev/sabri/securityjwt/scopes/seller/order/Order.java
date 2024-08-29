@@ -37,6 +37,7 @@ public class Order {
     private String country;
     private float deliveryFee;
     private Date orderedOn;
+    private OrderStatus status;
 
     @Override
     public String toString() {
