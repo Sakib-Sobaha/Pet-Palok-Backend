@@ -46,6 +46,7 @@ public class Seller implements UserDetails {
     private Date dob;
     private String image;
     private String rating;
+    private String status;
     Role role;
     Gender gender;
 //    List<String> items = new ArrayList<String>();

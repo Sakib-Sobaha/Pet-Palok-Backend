@@ -9,10 +9,9 @@ import dev.sabri.securityjwt.scopes.user.dto.UserRegisterRequest;
 import dev.sabri.securityjwt.scopes.vets.dto.VetRegisterRequest;
 import dev.sabri.securityjwt.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")

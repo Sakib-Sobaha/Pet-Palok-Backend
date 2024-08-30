@@ -55,6 +55,8 @@ public class User implements UserDetails {
 
     private String status;
 
+    private boolean enabled = true;
+
     Gender gender;
 
     Role role = Role.USER;
@@ -129,7 +131,7 @@ public class User implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
 

@@ -1,8 +1,8 @@
 package dev.sabri.securityjwt.scopes.admin;
 
 
+import dev.sabri.securityjwt.controller.dto.StatusUpdateRequest;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
-import dev.sabri.securityjwt.scopes.seller.Seller;
 import dev.sabri.securityjwt.scopes.seller.SellerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,7 @@ public class AdminController {
         }
 
         // Check whether the old password is correct
-        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), admin.getPassword())) {
+        if (!passwordEncoder.matches(updatePasswordRequest.getCurrentPassword(), admin.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
         }
 
@@ -117,6 +117,12 @@ public class AdminController {
         System.out.println("Updated user from DB: " + updatedAdmin);
 
         return ResponseEntity.ok("Admin updated successfully");
+    }
+
+    @PatchMapping("/update-status/{adminId}")
+    public ResponseEntity<String> updateAdminStatus(@PathVariable("adminId") String adminId, @RequestBody StatusUpdateRequest statusUpdateRequest) {
+        adminService.updateAdminStatus(adminId, statusUpdateRequest.status());
+        return ResponseEntity.ok("Admin status updated successfully");
     }
 
 }

@@ -1,9 +1,12 @@
 package dev.sabri.securityjwt.scopes.vets;
 
 
+import dev.sabri.securityjwt.controller.dto.StatusUpdateRequest;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
 import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
+import dev.sabri.securityjwt.utils.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +78,7 @@ public class VetController {
         }
 
         // Check whether the old password is correct
-        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), vet.getPassword())) {
+        if (!passwordEncoder.matches(updatePasswordRequest.getCurrentPassword(), vet.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
         }
 
@@ -85,6 +87,12 @@ public class VetController {
         vetRepository.save(vet);
 
         return ResponseEntity.ok("Password updated successfully");
+    }
+
+    @PatchMapping("/update-status/{vetId}")
+    public ResponseEntity<String> updateVetStatus(@PathVariable("vetId") String vetId, @RequestBody StatusUpdateRequest statusUpdateRequest) {
+        vetService.updateVetStatus(vetId, statusUpdateRequest.status());
+        return ResponseEntity.ok("Vet status updated successfully");
     }
 
     @PutMapping("/update/{vetId}")
@@ -157,6 +165,21 @@ public class VetController {
 
         return ResponseEntity.ok("Vet updated successfully");
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request){
+
+        String authToken = request.getHeader("Authorization");
+        String email = JwtService.extractUsername(authToken);
+
+        if(email != null){
+            vetService.updateVetStatusByEmail(email, "offline");
+            return ResponseEntity.ok("Vet logged out successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
 
 
 }

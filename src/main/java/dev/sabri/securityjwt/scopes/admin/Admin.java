@@ -26,6 +26,7 @@ public class Admin implements UserDetails {
     private String email;
     private String password;
     private String image;
+    private String status;
     Role role = Role.ADMIN;
 
     public Admin() {}

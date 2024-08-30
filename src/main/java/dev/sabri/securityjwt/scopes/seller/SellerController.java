@@ -1,6 +1,7 @@
 package dev.sabri.securityjwt.scopes.seller;
 
 
+import dev.sabri.securityjwt.controller.dto.StatusUpdateRequest;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
 import dev.sabri.securityjwt.scopes.user.Gender;
 import dev.sabri.securityjwt.scopes.user.Role;
@@ -75,7 +76,7 @@ public class SellerController {
         }
 
         // Check whether the old password is correct
-        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), seller.getPassword())) {
+        if (!passwordEncoder.matches(updatePasswordRequest.getCurrentPassword(), seller.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
         }
 
@@ -160,6 +161,12 @@ public class SellerController {
         System.out.println("Updated seller from DB: " + updatedSeller);
 
         return ResponseEntity.ok("Seller updated successfully");
+    }
+
+    @PatchMapping("/update-status/{sellerId}")
+    public ResponseEntity<String> updateSellerStatus(@PathVariable("sellerId") String sellerId,@RequestBody StatusUpdateRequest statusUpdateRequest) {
+        sellerService.updateSellerStatus(sellerId, statusUpdateRequest.status());
+        return ResponseEntity.ok("Seller Status updated successfully");
     }
 
 

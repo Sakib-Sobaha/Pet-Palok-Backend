@@ -1,9 +1,12 @@
 package dev.sabri.securityjwt.scopes.user;
 
 
+import dev.sabri.securityjwt.controller.dto.StatusUpdateRequest;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
+import dev.sabri.securityjwt.utils.JwtService;
+import dev.sabri.securityjwt.utils.JwtTokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,9 +23,13 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
-    @Autowired
+//    @Autowired
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+//    @Autowired
+    private JwtTokenService jwtTokenService;
+
+
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -78,7 +85,7 @@ public class UserController {
         }
 
         // Check whether the old password is correct
-        if (!passwordEncoder.matches(updatePasswordRequest.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(updatePasswordRequest.getCurrentPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
         }
 
@@ -155,6 +162,35 @@ public class UserController {
 
         return ResponseEntity.ok("User updated successfully");
     }
+
+
+
+
+
+    @PatchMapping("/update-status/{userId}")
+    public ResponseEntity<String> updateUserStatus(@PathVariable("userId") String userId,@RequestBody StatusUpdateRequest updateUserRequest) {
+        userService.updateUserStatus(userId, updateUserRequest.status());
+        return ResponseEntity.ok("User status updated successfully");
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+        String authToken = request.getHeader("Authorization");
+        String email = JwtService.extractUsername(authToken);
+        System.out.println("Email:" + email);
+
+        if(email != null) {
+            userService.updateUserStatusByEmail(email, "offline");
+            // TODO: remove the token from the storage
+            return ResponseEntity.ok("User logged out successfully");
+
+        }else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+    }
+
 
 
     public void setUserDetails(@RequestBody NewUserRequest newUserRequest, User user) {

@@ -1,16 +1,16 @@
 package dev.sabri.securityjwt.controller.dto;
 
 public class UpdatePasswordRequest {
-    private String oldPassword;
+    private String currentPassword;
     private String newPassword;
 
     // Getters and setters
-    public String getOldPassword() {
-        return oldPassword;
+    public String getCurrentPassword() {
+        return currentPassword;
     }
 
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
     }
 
     public String getNewPassword() {
