@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Collection;
 @Setter
@@ -56,6 +57,10 @@ public class User implements UserDetails {
     private String status;
 
     private boolean enabled = true;
+
+    private String verificationCode;
+
+    private LocalDateTime verificationCodeExpiresAt;
 
     Gender gender;
 
@@ -128,7 +133,7 @@ public class User implements UserDetails {
         return true;
     }
 
-    @JsonIgnore
+//    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return enabled;

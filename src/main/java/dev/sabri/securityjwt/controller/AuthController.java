@@ -3,14 +3,18 @@ package dev.sabri.securityjwt.controller;
 import dev.sabri.securityjwt.controller.dto.AuthenticationRequest;
 import dev.sabri.securityjwt.controller.dto.AuthenticationResponse;
 import dev.sabri.securityjwt.controller.dto.RegisterRequest;
+import dev.sabri.securityjwt.controller.dto.VerifyUser;
+import dev.sabri.securityjwt.response.AuthResponse;
+import dev.sabri.securityjwt.scopes.admin.Admin;
 import dev.sabri.securityjwt.scopes.admin.dto.AdminRegisterRequest;
+import dev.sabri.securityjwt.scopes.seller.Seller;
 import dev.sabri.securityjwt.scopes.seller.dto.SellerRegisterRequest;
+import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.dto.UserRegisterRequest;
+import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.dto.VetRegisterRequest;
 import dev.sabri.securityjwt.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +23,7 @@ public record AuthController(AuthenticationService authenticationService) {
 
 
     @PostMapping("/auth/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
@@ -31,7 +35,7 @@ public record AuthController(AuthenticationService authenticationService) {
     }
 
     @PostMapping("/admin/register")
-    public ResponseEntity<AuthenticationResponse> adminRegister(@RequestBody AdminRegisterRequest request) {
+    public ResponseEntity<Admin> adminRegister(@RequestBody AdminRegisterRequest request) {
         return ResponseEntity.ok(authenticationService.adminRegister(request));
     }
 
@@ -41,7 +45,7 @@ public record AuthController(AuthenticationService authenticationService) {
     }
 
     @PostMapping("/user/register")
-    public ResponseEntity<AuthenticationResponse> userRegister(@RequestBody UserRegisterRequest request) {
+    public ResponseEntity<User> userRegister(@RequestBody UserRegisterRequest request) {
         return ResponseEntity.ok(authenticationService.userRegister(request));
     }
 
@@ -52,8 +56,28 @@ public record AuthController(AuthenticationService authenticationService) {
         return ResponseEntity.ok(authenticationService.userAuthenticate(request));
     }
 
+    @PostMapping("/user/verify")
+    public ResponseEntity<?> verifyUser(@RequestBody VerifyUser verifyUser){
+        try {
+            authenticationService.verifyUser(verifyUser);
+            return ResponseEntity.ok("Account verified successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/user/resend")
+    public ResponseEntity<?> resendVerificationCode(@RequestParam String email){
+        try {
+            authenticationService.resendVerificationCode(email);
+            return ResponseEntity.ok("Verification code resent");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/vet/register")
-    public ResponseEntity<AuthenticationResponse> vetRegister(@RequestBody VetRegisterRequest request) {
+    public ResponseEntity<Vet> vetRegister(@RequestBody VetRegisterRequest request) {
         return ResponseEntity.ok(authenticationService.vetRegister(request));
     }
 
@@ -63,7 +87,7 @@ public record AuthController(AuthenticationService authenticationService) {
     }
 
     @PostMapping("/seller/register")
-    public ResponseEntity<AuthenticationResponse> sellerRegister(@RequestBody SellerRegisterRequest request) {
+    public ResponseEntity<Seller> sellerRegister(@RequestBody SellerRegisterRequest request) {
         return ResponseEntity.ok(authenticationService.sellerRegister(request));
     }
 

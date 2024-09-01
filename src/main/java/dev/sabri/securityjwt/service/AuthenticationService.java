@@ -3,8 +3,7 @@ package dev.sabri.securityjwt.service;
 import dev.sabri.securityjwt.controller.dto.AuthenticationRequest;
 import dev.sabri.securityjwt.controller.dto.AuthenticationResponse;
 import dev.sabri.securityjwt.controller.dto.RegisterRequest;
-import dev.sabri.securityjwt.email.EmailSender;
-import dev.sabri.securityjwt.email.EmailService;
+import dev.sabri.securityjwt.controller.dto.VerifyUser;
 import dev.sabri.securityjwt.scopes.admin.Admin;
 import dev.sabri.securityjwt.scopes.admin.AdminRepository;
 import dev.sabri.securityjwt.scopes.admin.dto.AdminRegisterRequest;
@@ -17,13 +16,15 @@ import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.VetRepository;
 import dev.sabri.securityjwt.scopes.vets.dto.VetRegisterRequest;
 import dev.sabri.securityjwt.utils.JwtService;
-import dev.sabri.securityjwt.utils.JwtTokenService;
+import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public record AuthenticationService(UserRepository userRepository,
@@ -32,10 +33,11 @@ public record AuthenticationService(UserRepository userRepository,
                                     VetRepository vetRepository,
                                     PasswordEncoder passwordEncoder,
                                     AuthenticationManager authenticationManager,
-                                    EmailSender emailSender,
                                     EmailValidator emailValidator,
-                                    JwtTokenService jwtTokenService) {
-    public AuthenticationResponse register(RegisterRequest request) {
+                                    EmailService emailService,
+                                    JwtService jwtService
+                                    ) {
+    public User register(RegisterRequest request) {
         final var user = new User(null,
                 request.firstname(),
                 request.lastname(),
@@ -44,7 +46,7 @@ public record AuthenticationService(UserRepository userRepository,
                 Role.USER);
         userRepository.save(user);
         final var token = JwtService.generateToken(user);
-        return new AuthenticationResponse(token);
+        return user;
     }
 
 
@@ -58,13 +60,13 @@ public record AuthenticationService(UserRepository userRepository,
         );
         final var user = userRepository.findByEmail(request.email()).orElseThrow();
         final var token = JwtService.generateToken(user);
-        return new AuthenticationResponse(token);
+        return new AuthenticationResponse(token, jwtService.getJwtExpiration());
 
     }
 
 
 
-    public AuthenticationResponse adminRegister(AdminRegisterRequest request) {
+    public Admin adminRegister(AdminRegisterRequest request) {
         boolean adminExists = adminRepository.findByEmail(request.email()).isPresent();
         if (adminExists) {
             throw new IllegalStateException("email already taken");
@@ -83,11 +85,8 @@ public record AuthenticationService(UserRepository userRepository,
         adminRepository.save(admin);
         final var token = JwtService.generateToken(admin);
 
-//        String link = "http://localhost:8080/api/v1/admin/register/confirm?token=" + token;
-//        emailSender.send(
-//                request.email(),
-//                jwtTokenService().buildEmail(request.email(), link));
-        return new AuthenticationResponse(token);
+
+        return admin;
     }
 
     public AuthenticationResponse adminAuthenticate(AuthenticationRequest request) {
@@ -100,13 +99,15 @@ public record AuthenticationService(UserRepository userRepository,
         );
         final var admin = adminRepository.findByEmail(request.email()).orElseThrow();
         final var token = JwtService.generateToken(admin);
-        return new AuthenticationResponse(token);
+        admin.setStatus("online");
+        adminRepository.save(admin);
+        return new AuthenticationResponse(token, jwtService().getJwtExpiration());
 
     }
 
 
 
-    public AuthenticationResponse userRegister(UserRegisterRequest request) {
+    public User userRegister(UserRegisterRequest request) {
         boolean userExists = userRepository.findByEmail(request.email()).isPresent();
         if (userExists) {
             throw new IllegalStateException("email already taken");
@@ -121,43 +122,119 @@ public record AuthenticationService(UserRepository userRepository,
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 Role.USER);
+
+        user.setVerificationCode(generateVerificationCode());
+        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(30));
+        user.setEnabled(false);
+        sendVerificationEmail(user);
+
         userRepository.save(user);
         final var token = JwtService.generateToken(user);
 
-//        String link = "http://localhost:8080/api/v1/user/register/confirm?token=" + token;
-//        emailSender.send(
-//                request.email(),
-//                jwtTokenService().buildEmail(request.email(), link));
 
-        return new AuthenticationResponse(token);
+        return user;
     }
 
 
 
     public AuthenticationResponse userAuthenticate(AuthenticationRequest request) {
 
+
+        final var user = userRepository.findByEmail(request.email()).orElseThrow();
+        if(!user.isEnabled()){
+            throw new RuntimeException("Account not verified. Please verify your account");
+        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
                         request.password()
                 )
         );
-        final var user = userRepository.findByEmail(request.email()).orElseThrow();
+
         final var token = JwtService.generateToken(user);
         user.setStatus("online");
         userRepository.save(user);
-        return new AuthenticationResponse(token);
+        return new AuthenticationResponse(token,jwtService.getJwtExpiration());
 
     }
 
-    public AuthenticationResponse vetRegister(VetRegisterRequest request) {
+    public void verifyUser(VerifyUser input){
+        Optional<User> optionalUser = userRepository.findByEmail(input.email());
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            if(user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())){
+                throw new RuntimeException("Verification code has expired");
+            }
+            if(user.getVerificationCode().equals(input.verificationCode())){
+                user.setStatus("online");
+                user.setEnabled(true);
+                user.setVerificationCode(null);
+                user.setVerificationCodeExpiresAt(null);
+                userRepository.save(user);
+            } else {
+                throw new RuntimeException("Invalid verification code");
+            }
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    public void resendVerificationCode(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (user.isEnabled()) {
+                throw new RuntimeException("Account is already verified");
+            }
+            user.setVerificationCode(generateVerificationCode());
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
+            sendVerificationEmail(user);
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    private void sendVerificationEmail(User user) { //TODO: Update with company logo
+        String subject = "Account Verification";
+        String verificationCode = "VERIFICATION CODE " + user.getVerificationCode();
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
+        }
+    }
+
+    private String generateVerificationCode() {
+        Random random = new Random();
+        int code = random.nextInt(900000) + 100000;
+        return String.valueOf(code);
+    }
+
+
+
+    public Vet vetRegister(VetRegisterRequest request) {
         final var vet = new Vet(null,
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 Role.VET);
         vetRepository.save(vet);
         final var token = JwtService.generateToken(vet);
-        return new AuthenticationResponse(token);
+        return vet;
     }
 
     public AuthenticationResponse vetAuthenticate(AuthenticationRequest request) {
@@ -172,11 +249,11 @@ public record AuthenticationService(UserRepository userRepository,
         final var token = JwtService.generateToken(vet);
         vet.setStatus("online");
         vetRepository.save(vet);
-        return new AuthenticationResponse(token);
+        return new AuthenticationResponse(token, jwtService.getJwtExpiration());
 
     }
 
-    public AuthenticationResponse sellerRegister(SellerRegisterRequest request) {
+    public Seller sellerRegister(SellerRegisterRequest request) {
         boolean sellerExists = sellerRepository.findByEmail(request.email()).isPresent();
         if (sellerExists) {
             throw new IllegalStateException("email already taken");
@@ -189,7 +266,7 @@ public record AuthenticationService(UserRepository userRepository,
                 Role.SELLER);
         sellerRepository.save(seller);
         final var token = JwtService.generateToken(seller);
-        return new AuthenticationResponse(token);
+        return seller;
     }
 
     public AuthenticationResponse sellerAuthenticate(AuthenticationRequest request) {
@@ -202,7 +279,9 @@ public record AuthenticationService(UserRepository userRepository,
         );
         final var seller = sellerRepository.findByEmail(request.email()).orElseThrow();
         final var token = JwtService.generateToken(seller);
-        return new AuthenticationResponse(token);
+        seller.setStatus("online");
+        sellerRepository.save(seller);
+        return new AuthenticationResponse(token, jwtService.getJwtExpiration());
 
     }
 

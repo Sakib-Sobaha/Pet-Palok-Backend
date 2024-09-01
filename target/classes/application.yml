@@ -26,3 +26,6 @@ spring:
           auth: true
           starttls:
             enable: true
+
+#JWT secret key
+

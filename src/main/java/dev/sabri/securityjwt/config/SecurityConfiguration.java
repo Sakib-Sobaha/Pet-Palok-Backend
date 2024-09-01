@@ -68,6 +68,7 @@ public class SecurityConfiguration {
                                 new AntPathRequestMatcher("/actuator/*"),
                                 new AntPathRequestMatcher("/api/v1/user/register"),
                                 new AntPathRequestMatcher("/api/v1/user/authenticate"),
+                                new AntPathRequestMatcher("/api/v1/user/verify"),
                                 new AntPathRequestMatcher("/api/v1/admin/register"),
                                 new AntPathRequestMatcher("/api/v1/admin/authenticate"),
                                 new AntPathRequestMatcher("/api/v1/seller/register"),

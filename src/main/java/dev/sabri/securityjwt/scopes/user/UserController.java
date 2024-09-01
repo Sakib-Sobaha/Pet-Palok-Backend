@@ -4,7 +4,6 @@ package dev.sabri.securityjwt.scopes.user;
 import dev.sabri.securityjwt.controller.dto.StatusUpdateRequest;
 import dev.sabri.securityjwt.controller.dto.UpdatePasswordRequest;
 import dev.sabri.securityjwt.utils.JwtService;
-import dev.sabri.securityjwt.utils.JwtTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 //    @Autowired
-    private JwtTokenService jwtTokenService;
+
 
 
 

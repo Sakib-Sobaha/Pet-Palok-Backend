@@ -22,6 +22,7 @@ public class JwtService {
 
     private static final String SECRET_KEY = "635266556A576E5A7234753778214125442A472D4B6150645367566B59703273";
 
+    private long jwtExpiration = 3600000;
     private JwtService() {
     }
 
@@ -47,6 +48,10 @@ public class JwtService {
 
     public static String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
+    }
+
+    public long getJwtExpiration(){
+        return jwtExpiration;
     }
 
     public static boolean isTokenValid(

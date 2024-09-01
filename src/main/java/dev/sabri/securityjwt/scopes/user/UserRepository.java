@@ -13,6 +13,8 @@ public interface UserRepository extends MongoRepository<User, String> {
     //    User findByEmail(String email);
     User findUserById(String id);
 
+    Optional<User> findByVerificationCode(String verificationCode);
+
     @Transactional
     @Query("{ 'email' :  ?0 }")
     int enableUser(String email);
