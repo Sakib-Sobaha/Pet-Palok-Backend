@@ -56,7 +56,7 @@ public class MarketItemsController {
     }
 
     @GetMapping("/getItemsBySellerId/{sellerId}")
-    public ResponseEntity<Optional<List<MarketItems>>> getItemsBySellerId(@PathVariable("sellerId") String sellerId) {
+    public ResponseEntity<List<MarketItems>> getItemsBySellerId(@PathVariable("sellerId") String sellerId) {
         System.out.println("Received by sellerId: " + sellerId);
         return ResponseEntity.ok(marketItemsRepository.findBySellerId(sellerId));
     }

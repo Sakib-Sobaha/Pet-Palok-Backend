@@ -6,6 +6,8 @@ import dev.sabri.securityjwt.scopes.seller.MarketItems;
 import dev.sabri.securityjwt.scopes.seller.MarketItemsRepository;
 import dev.sabri.securityjwt.scopes.seller.Seller;
 import dev.sabri.securityjwt.scopes.seller.SellerRepository;
+import dev.sabri.securityjwt.scopes.seller.review.pending.PendingReview;
+import dev.sabri.securityjwt.scopes.seller.review.pending.PendingReviewRepository;
 import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
 import dev.sabri.securityjwt.scopes.user.cart.CartItem;
@@ -41,6 +43,9 @@ public class OrderController {
 
     @Autowired
     private SellerRepository sellerRepository;
+
+    @Autowired
+    private PendingReviewRepository pendingReviewRepository;
 
     @GetMapping("/getOrdersByUserId")
     public ResponseEntity<Optional<List<Order>>> getOrdersByUserId(Principal principal) {
@@ -138,16 +143,31 @@ public class OrderController {
     @GetMapping("/delivered/{orderId}")
     public ResponseEntity<Optional<Order>> deliveredOrder(@PathVariable String orderId) {
         Optional<Order> order = orderRepository.findById(orderId);
+
         if (order.isPresent() && order.get().getStatus() == OrderStatus.OUT_FOR_DELIVERY) {
             Order order1 = order.get();
             order1.setStatus(OrderStatus.DELIVERED);
             orderRepository.save(order1);
+
+            // Create pending reviews for each item in the order
+            createPendingReviewsForOrder(order1);
 
             return ResponseEntity.ok(Optional.of(order1));
         }
 
         return ResponseEntity.notFound().build();
     }
+
+    private void createPendingReviewsForOrder(Order order) {
+        for (String marketItemId : order.getItemCountMap().keySet()) {
+            PendingReview newPendingReview = new PendingReview();
+            newPendingReview.setUserId(order.getUserId());
+            newPendingReview.setMarketItemId(marketItemId);
+
+            pendingReviewRepository.save(newPendingReview);
+        }
+    }
+
 
     @PostMapping("/createOrder")
     public ResponseEntity<Order> createOrder(@RequestBody NewOrder newOrder, Principal principal) {

@@ -46,7 +46,7 @@ public class Seller implements UserDetails {
     private String about;
     private Date dob;
     private String image;
-    private String rating;
+    private Float rating;
     private String status;
     private boolean enabled;
     private String verificationCode;
