@@ -16,6 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -47,6 +48,9 @@ public class Seller implements UserDetails {
     private String image;
     private String rating;
     private String status;
+    private boolean enabled;
+    private String verificationCode;
+    private LocalDateTime verificationCodeExpiresAt;
     Role role;
     Gender gender;
 //    List<String> items = new ArrayList<String>();
@@ -97,7 +101,7 @@ public class Seller implements UserDetails {
         return true;
     }
 
-    @JsonIgnore
+//    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

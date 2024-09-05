@@ -1,8 +1,10 @@
 package dev.sabri.securityjwt.response;
 
 
+
 import lombok.Getter;
 import lombok.Setter;
+
 
 @Getter
 @Setter

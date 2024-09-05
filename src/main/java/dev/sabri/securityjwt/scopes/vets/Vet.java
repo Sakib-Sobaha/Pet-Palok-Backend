@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 
@@ -64,9 +65,15 @@ public class Vet implements UserDetails {
 
     private String status;
 
+    private boolean enabled;
+
+    private String verificationCode;
+
+    private LocalDateTime verificationCodeExpiresAt;
+
     Gender gender;
 
-    Role role;
+    Role role ;
 
     public Vet() {
     }
@@ -126,7 +133,7 @@ public class Vet implements UserDetails {
         return true;
     }
 
-    @JsonIgnore
+//    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

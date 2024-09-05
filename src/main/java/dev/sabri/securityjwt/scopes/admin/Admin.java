@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 
@@ -27,6 +28,9 @@ public class Admin implements UserDetails {
     private String password;
     private String image;
     private String status;
+    private boolean enabled;
+    private String verificationCode;
+    private LocalDateTime verificationCodeExpiresAt;
     Role role = Role.ADMIN;
 
     public Admin() {}
@@ -75,7 +79,7 @@ public class Admin implements UserDetails {
         return true;
     }
 
-    @JsonIgnore
+//    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

@@ -44,6 +44,26 @@ public record AuthController(AuthenticationService authenticationService) {
         return ResponseEntity.ok(authenticationService.adminAuthenticate(request));
     }
 
+    @PostMapping("/admin/verify")
+    public ResponseEntity<?> verifyAdmin(@RequestBody VerifyUser verifyUser) {
+        try {
+            authenticationService.verifyAdmin(verifyUser);
+            return ResponseEntity.ok("Account verified successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/admin/resend")
+    public ResponseEntity<?> resendAdminVerificationCode(@RequestParam String email){
+        try {
+            authenticationService.resendAdminVerificationCode(email);
+            return ResponseEntity.ok("Verification code resent");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/user/register")
     public ResponseEntity<User> userRegister(@RequestBody UserRegisterRequest request) {
         return ResponseEntity.ok(authenticationService.userRegister(request));
@@ -67,9 +87,9 @@ public record AuthController(AuthenticationService authenticationService) {
     }
 
     @PostMapping("/user/resend")
-    public ResponseEntity<?> resendVerificationCode(@RequestParam String email){
+    public ResponseEntity<?> resendUserVerificationCode(@RequestParam String email){
         try {
-            authenticationService.resendVerificationCode(email);
+            authenticationService.resendUserVerificationCode(email);
             return ResponseEntity.ok("Verification code resent");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -86,6 +106,27 @@ public record AuthController(AuthenticationService authenticationService) {
         return ResponseEntity.ok(authenticationService.vetAuthenticate(request));
     }
 
+    @PostMapping("/vet/verify")
+    public ResponseEntity<?> verifyVet(@RequestBody VerifyUser verifyUser){
+        try {
+            authenticationService.verifyVet(verifyUser);
+            return ResponseEntity.ok("Account verified successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/vet/resend")
+    public ResponseEntity<?> resendVetVerificationCode(@RequestParam String email){
+        try {
+            authenticationService.resendVetVerificationCode(email);
+            return ResponseEntity.ok("Verification code resent");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/seller/register")
     public ResponseEntity<Seller> sellerRegister(@RequestBody SellerRegisterRequest request) {
         return ResponseEntity.ok(authenticationService.sellerRegister(request));
@@ -94,6 +135,27 @@ public record AuthController(AuthenticationService authenticationService) {
     @PostMapping("/seller/authenticate")
     public ResponseEntity<AuthenticationResponse> sellerAuthenticate(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.sellerAuthenticate(request));
+    }
+
+    @PostMapping("/seller/verify")
+    public ResponseEntity<?> verifySeller(@RequestBody VerifyUser verifyUser){
+        try {
+            authenticationService.verifySeller(verifyUser);
+            return ResponseEntity.ok("Account verified successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/seller/resend")
+    public ResponseEntity<?> resendSellerVerificationCode(@RequestParam String email){
+        try {
+            authenticationService.resendSellerVerificationCode(email);
+            return ResponseEntity.ok("Verification code resent");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     

@@ -82,6 +82,12 @@ public record AuthenticationService(UserRepository userRepository,
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 Role.ADMIN);
+
+        admin.setVerificationCode(generateVerificationCode());
+        admin.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(30));
+        admin.setEnabled(false);
+        sendVerificationEmail(admin);
+
         adminRepository.save(admin);
         final var token = JwtService.generateToken(admin);
 
@@ -91,19 +97,87 @@ public record AuthenticationService(UserRepository userRepository,
 
     public AuthenticationResponse adminAuthenticate(AuthenticationRequest request) {
 
+        final var admin = adminRepository.findByEmail(request.email()).orElseThrow();
+
+        if(!admin.isEnabled()){
+            throw new RuntimeException("Account not verified. Please verify your email");
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
                         request.password()
                 )
         );
-        final var admin = adminRepository.findByEmail(request.email()).orElseThrow();
+
         final var token = JwtService.generateToken(admin);
         admin.setStatus("online");
         adminRepository.save(admin);
         return new AuthenticationResponse(token, jwtService().getJwtExpiration());
 
     }
+
+    public void verifyAdmin(VerifyUser input){
+        Optional<Admin> optionalAdmin = adminRepository.findByEmail(input.email());
+        if(optionalAdmin.isPresent()){
+            Admin admin = optionalAdmin.get();
+            if(admin.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())){
+                throw new RuntimeException("Admin verification code expired");
+            }
+            if(admin.getVerificationCode().equals(input.verificationCode())){
+                admin.setStatus("online");
+                admin.setEnabled(true);
+                admin.setVerificationCode(null);
+                admin.setVerificationCodeExpiresAt(null);
+                adminRepository.save(admin);
+            } else {
+                throw new RuntimeException("Admin verification code invalid");
+            }
+        } else {
+            throw new RuntimeException("Admin not found");
+        }
+    }
+
+    public void resendAdminVerificationCode(String email){
+        Optional<Admin> optionalAdmin = adminRepository.findByEmail(email);
+        if(optionalAdmin.isPresent()){
+            Admin admin = optionalAdmin.get();
+            if(admin.isEnabled()){
+                throw new RuntimeException("Admin is already verified");
+            }
+            admin.setVerificationCode(generateVerificationCode());
+            admin.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
+            sendVerificationEmail(admin);
+            adminRepository.save(admin);
+        } else {
+            throw new RuntimeException("Admin not found");
+        }
+    }
+
+
+    private void sendVerificationEmail(Admin admin) { //TODO: Update with company logo
+    String subject = "Account Verification";
+    String verificationCode = "VERIFICATION CODE " + admin.getVerificationCode();
+    String htmlMessage = "<html>"
+            + "<body style=\"font-family: Arial, sans-serif;\">"
+            + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+            + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+            + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
+            + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+            + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+            + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
+            + "</div>"
+            + "</div>"
+            + "</body>"
+            + "</html>";
+
+    try {
+        emailService.sendVerificationEmail(admin.getEmail(), subject, htmlMessage);
+    } catch (MessagingException e) {
+        // Handle email sending exception
+        e.printStackTrace();
+    }
+}
 
 
 
@@ -141,9 +215,10 @@ public record AuthenticationService(UserRepository userRepository,
 
 
         final var user = userRepository.findByEmail(request.email()).orElseThrow();
-        if(!user.isEnabled()){
-            throw new RuntimeException("Account not verified. Please verify your account");
-        }
+
+//        if(!user.isEnabled()){
+//            throw new RuntimeException("Account not verified. Please verify your account");
+//        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
@@ -179,7 +254,7 @@ public record AuthenticationService(UserRepository userRepository,
         }
     }
 
-    public void resendVerificationCode(String email) {
+    public void resendUserVerificationCode(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -228,10 +303,26 @@ public record AuthenticationService(UserRepository userRepository,
 
 
     public Vet vetRegister(VetRegisterRequest request) {
+        boolean vetExists = vetRepository.findByEmail(request.email()).isPresent();
+        if(vetExists){
+            throw new IllegalStateException("email already taken");
+        }
+
+        boolean isValidMail = emailValidator().test(request.email());
+        if(!isValidMail){
+            throw new IllegalStateException("invalid email");
+        }
+
         final var vet = new Vet(null,
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 Role.VET);
+
+        vet.setVerificationCode(generateVerificationCode());
+        vet.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(30));
+        vet.setEnabled(false);
+        sendVerificationEmail(vet);
+
         vetRepository.save(vet);
         final var token = JwtService.generateToken(vet);
         return vet;
@@ -239,13 +330,20 @@ public record AuthenticationService(UserRepository userRepository,
 
     public AuthenticationResponse vetAuthenticate(AuthenticationRequest request) {
 
+        final var vet = vetRepository.findByEmail(request.email()).orElseThrow();
+
+        if(!vet.isEnabled()){
+            throw new RuntimeException("Account not verified. Please verify your account");
+        }
+
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
                         request.password()
                 )
         );
-        final var vet = vetRepository.findByEmail(request.email()).orElseThrow();
+
         final var token = JwtService.generateToken(vet);
         vet.setStatus("online");
         vetRepository.save(vet);
@@ -253,10 +351,76 @@ public record AuthenticationService(UserRepository userRepository,
 
     }
 
+    public void verifyVet(VerifyUser input){
+        Optional<Vet> optionalVet = vetRepository.findByEmail(input.email());
+        if(optionalVet.isPresent()){
+            Vet vet = optionalVet.get();
+            if(vet.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())){
+                throw new RuntimeException("Verification code has expired");
+            }
+            if(vet.getVerificationCode().equals(input.verificationCode())){
+                vet.setStatus("online");
+                vet.setEnabled(true);
+                vet.setVerificationCode(null);
+                vet.setVerificationCodeExpiresAt(null);
+                vetRepository.save(vet);
+            } else {
+                throw new RuntimeException("Invalid verification code");
+            }
+        } else {
+            throw new RuntimeException("Vet not found");
+        }
+    }
+
+    public void resendVetVerificationCode(String email) {
+        Optional<Vet> optionalVet = vetRepository.findByEmail(email);
+        if(optionalVet.isPresent()){
+            Vet vet = optionalVet.get();
+            if(vet.isEnabled()){
+                throw new RuntimeException("Account not verified");
+            }
+            vet.setVerificationCode(generateVerificationCode());
+            vet.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
+            sendVerificationEmail(vet);
+            vetRepository.save(vet);
+        }
+    }
+
+
+    private void sendVerificationEmail(Vet vet) { //TODO: Update with company logo
+        String subject = "Account Verification";
+        String verificationCode = "VERIFICATION CODE " + vet.getVerificationCode();
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            emailService.sendVerificationEmail(vet.getEmail(), subject, htmlMessage);
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
+        }
+    }
+
+
     public Seller sellerRegister(SellerRegisterRequest request) {
         boolean sellerExists = sellerRepository.findByEmail(request.email()).isPresent();
         if (sellerExists) {
             throw new IllegalStateException("email already taken");
+        }
+
+        boolean isValidMail = emailValidator().test(request.email());
+        if(!isValidMail){
+            throw new IllegalStateException("invalid email");
         }
 
 
@@ -264,6 +428,12 @@ public record AuthenticationService(UserRepository userRepository,
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 Role.SELLER);
+
+        seller.setVerificationCode(generateVerificationCode());
+        seller.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(30));
+        seller.setEnabled(true);
+        sendVerificationEmail(seller);
+
         sellerRepository.save(seller);
         final var token = JwtService.generateToken(seller);
         return seller;
@@ -271,19 +441,87 @@ public record AuthenticationService(UserRepository userRepository,
 
     public AuthenticationResponse sellerAuthenticate(AuthenticationRequest request) {
 
+        final var seller = sellerRepository.findByEmail(request.email()).orElseThrow();
+        if(!seller.isEnabled()){
+            throw new RuntimeException("Account not verified. Please verify your account");
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
                         request.password()
                 )
         );
-        final var seller = sellerRepository.findByEmail(request.email()).orElseThrow();
+
         final var token = JwtService.generateToken(seller);
         seller.setStatus("online");
         sellerRepository.save(seller);
         return new AuthenticationResponse(token, jwtService.getJwtExpiration());
 
     }
+
+    public void verifySeller(VerifyUser input){
+        Optional<Seller> optionalSeller = sellerRepository.findByEmail(input.email());
+        if(optionalSeller.isPresent()){
+            Seller seller = optionalSeller.get();
+            if(seller.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())){
+                throw new RuntimeException("Verification code has expired");
+            }
+            if(seller.getVerificationCode().equals(input.verificationCode())){
+                seller.setStatus("online");
+                seller.setEnabled(true);
+                seller.setVerificationCode(null);
+                seller.setVerificationCodeExpiresAt(null);
+                sellerRepository.save(seller);
+            } else {
+                throw new RuntimeException("Invalid verification code");
+            }
+        } else {
+            throw new RuntimeException("Seller not found");
+        }
+    }
+
+    public void resendSellerVerificationCode(String email) {
+        Optional<Seller> optionalSeller = sellerRepository.findByEmail(email);
+        if(optionalSeller.isPresent()){
+            Seller seller = optionalSeller.get();
+            if(seller.isEnabled()){
+                throw new RuntimeException("Account is already verified");
+            }
+            seller.setVerificationCode(generateVerificationCode());
+            seller.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(1));
+            sendVerificationEmail(seller);
+            sellerRepository.save(seller);
+        } else {
+            throw new RuntimeException("Seller not found");
+        }
+    }
+
+    private void sendVerificationEmail(Seller seller) { //TODO: Update with company logo
+        String subject = "Account Verification";
+        String verificationCode = "VERIFICATION CODE " + seller.getVerificationCode();
+        String htmlMessage = "<html>"
+                + "<body style=\"font-family: Arial, sans-serif;\">"
+                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
+                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
+                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
+                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
+                + "</div>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+
+        try {
+            emailService.sendVerificationEmail(seller.getEmail(), subject, htmlMessage);
+        } catch (MessagingException e) {
+            // Handle email sending exception
+            e.printStackTrace();
+        }
+    }
+
+
 
 
 }
