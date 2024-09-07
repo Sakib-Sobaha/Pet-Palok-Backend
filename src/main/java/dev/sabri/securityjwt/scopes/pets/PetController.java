@@ -3,16 +3,16 @@ package dev.sabri.securityjwt.scopes.pets;
 
 import dev.sabri.securityjwt.client.imagestorage.AzureImageStorageClient;
 import dev.sabri.securityjwt.scopes.pets.dto.NewPetRequest;
+import dev.sabri.securityjwt.scopes.user.User;
+import dev.sabri.securityjwt.scopes.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.security.Principal;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/pets")
@@ -22,6 +22,7 @@ public class PetController {
     private final PetService petService;
     private final PetRepository petRepository;
     private final AzureImageStorageClient azureImageStorageClient;
+    private final UserRepository userRepository;
 
 
     @GetMapping("/getAllPets")
@@ -45,6 +46,17 @@ public class PetController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
+    @GetMapping("/myPets")
+    public ResponseEntity<Optional<List<Pet>>> getMyPets(Principal principal) {
+        String email = principal.getName();
+        Optional<User> user_ = userRepository.findByEmail(email);
+
+        if (user_.isPresent()) {
+            return ResponseEntity.ok(petRepository.findPetByOwnerId(user_.get().getId()));
+        } else
+            return ResponseEntity.notFound().build();
+
+    }
 
 
 //    record NewPetRequest(String name, int age, String type, String breed, String description, Gender, boolean vetVerified) {
@@ -53,9 +65,9 @@ public class PetController {
 
     @PostMapping("/create-pet")
     public ResponseEntity<String> createPet(@RequestBody NewPetRequest newPetRequest) {
-        Pet pet = new Pet(newPetRequest.ownerId,  newPetRequest.name,newPetRequest.dob , newPetRequest.type,newPetRequest.breed, newPetRequest.description, newPetRequest.gender, newPetRequest.vetVerified, newPetRequest.images);
-        System.out.println("Received new pet request: " );
-        System.out.println(newPetRequest.name + " " + newPetRequest.description+ "imageUrl" + newPetRequest.dob);
+        Pet pet = new Pet(newPetRequest.ownerId, newPetRequest.name, newPetRequest.dob, newPetRequest.type, newPetRequest.breed, newPetRequest.description, newPetRequest.gender, newPetRequest.vetVerified, newPetRequest.images);
+        System.out.println("Received new pet request: ");
+        System.out.println(newPetRequest.name + " " + newPetRequest.description + "imageUrl" + newPetRequest.dob);
 //        List<String> imageUrls = new ArrayList<>();
 //
 //        //Upload each image and store the url
