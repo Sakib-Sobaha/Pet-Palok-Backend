@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -14,6 +15,8 @@ public interface UserRepository extends MongoRepository<User, String> {
     User findUserById(String id);
 
     Optional<User> findByVerificationCode(String verificationCode);
+
+    List<User> findAllByStatus(String status);
 
     @Transactional
     @Query("{ 'email' :  ?0 }")

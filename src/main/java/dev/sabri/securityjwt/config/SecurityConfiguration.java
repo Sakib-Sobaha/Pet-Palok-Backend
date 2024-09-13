@@ -28,6 +28,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -82,6 +84,7 @@ public class SecurityConfiguration {
                                 new AntPathRequestMatcher("/api/v1/vet/authenticate"),
                                 new AntPathRequestMatcher("/api/v1/vet/verify"),
                                 new AntPathRequestMatcher("/api/v1/vet/resend"),
+                                new AntPathRequestMatcher("/ws/**"),
 //                                new AntPathRequestMatcher("/api/**"),
 //                                new AntPathRequestMatcher("/api/v1/**"),
 //                                new AntPathRequestMatcher("/api/v1/auth/*"),
@@ -152,13 +155,18 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Allow all origins
-        configuration.setAllowedOrigins(List.of("*"));
+//        configuration.setAllowedOrigins(List.of("*"));
 
         // Allow all HTTP methods
-        configuration.setAllowedMethods(List.of("*"));
+//        configuration.setAllowedMethods(List.of("*"));
 
         // Allow all headers
-        configuration.setAllowedHeaders(List.of("*"));
+//        configuration.setAllowedHeaders(List.of("*"));
+
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // or your specific frontend host
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowCredentials(true); // Important for cookies, authorization headers with HTTPS
 
         // Allow credentials if needed (be cautious with this in production)
 //        configuration.setAllowCredentials(true);
