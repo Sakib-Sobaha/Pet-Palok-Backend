@@ -25,6 +25,7 @@ public class PendingReviewController {
 
     @GetMapping("/fetchByUser")
     public ResponseEntity<List<PendingReview>> fetchByUser(Principal principal) {
+        System.out.println("fetch review by user: " + principal.getName());
         String email = principal.getName();
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {

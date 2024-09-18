@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/v1/community")
+@RequestMapping("api/v1/communities")
 @AllArgsConstructor
 public class CommunityController {
     @Autowired

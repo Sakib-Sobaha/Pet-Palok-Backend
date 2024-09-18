@@ -25,4 +25,5 @@ public class AppointmentRequest {
     private Date bookingTime;
     private String description;
     private boolean online;
+    private AppointmentRequestState state;
 }

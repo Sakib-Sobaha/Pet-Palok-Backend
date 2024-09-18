@@ -2,6 +2,9 @@ package dev.sabri.securityjwt.scopes.seller.order;
 
 import java.util.Date;
 
+import dev.sabri.securityjwt.scopes.notifications.Notification;
+import dev.sabri.securityjwt.scopes.notifications.NotificationRepository;
+import dev.sabri.securityjwt.scopes.notifications.NotificationType;
 import dev.sabri.securityjwt.scopes.seller.MarketItems;
 import dev.sabri.securityjwt.scopes.seller.MarketItemsRepository;
 import dev.sabri.securityjwt.scopes.seller.Seller;
@@ -46,6 +49,8 @@ public class OrderController {
 
     @Autowired
     private PendingReviewRepository pendingReviewRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @GetMapping("/getOrdersByUserId")
     public ResponseEntity<Optional<List<Order>>> getOrdersByUserId(Principal principal) {
@@ -106,11 +111,33 @@ public class OrderController {
 
             System.out.println("Accepted order" + orderId);
 
+            // generate a notification:
+            Notification notification = new Notification();
+            notification.setType(NotificationType.ORDER_ACCEPTED);
+
+            // Build the notification text
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Order accepted. Items:\n");
+
+            // Iterate over itemCountMap to append item details
+            orderToAccept.getItemCountMap().forEach((itemName, count) -> {
+                stringBuilder.append(marketItemsRepository.findById(itemName).get().getName()).append(": ").append(count).append("\n");
+            });
+
+            // Set the notification text with item details
+            notification.setText(stringBuilder.toString());
+            notification.setTimestamp(new Date());
+            notification.setReceiver(orderToAccept.getUserId());
+            notification.setMainContextId(orderToAccept.getId());
+            notification.setUnread(true);
+            notificationRepository.save(notification);
+
             return ResponseEntity.ok(Optional.of(orderToAccept));
         }
 
         return ResponseEntity.notFound().build();
     }
+
 
     @GetMapping("/reject/{orderId}")
     public ResponseEntity<Optional<Order>> rejectOrder(@PathVariable String orderId) {
@@ -119,6 +146,27 @@ public class OrderController {
             Order orderToReject = order.get();
             orderToReject.setStatus(OrderStatus.REJECTED);
             orderRepository.save(orderToReject);
+
+            // generate a notification:
+            Notification notification = new Notification();
+            notification.setType(NotificationType.ORDER_DECLINED);
+
+            // Build the notification text
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Order declined. Items:\n");
+
+            // Iterate over itemCountMap to append item details
+            orderToReject.getItemCountMap().forEach((itemName, count) -> {
+                stringBuilder.append(marketItemsRepository.findById(itemName).get().getName()).append(": ").append(count).append("\n");
+            });
+
+            // Set the notification text with item details
+            notification.setText(stringBuilder.toString());
+            notification.setTimestamp(new Date());
+            notification.setReceiver(orderToReject.getUserId());
+            notification.setMainContextId(orderToReject.getId());
+            notification.setUnread(true);
+            notificationRepository.save(notification);
 
             return ResponseEntity.ok(Optional.of(orderToReject));
         }
@@ -133,6 +181,28 @@ public class OrderController {
             Order order1 = order.get();
             order1.setStatus(OrderStatus.OUT_FOR_DELIVERY);
             orderRepository.save(order1);
+
+            // generate a notification:
+            Notification notification = new Notification();
+            notification.setType(NotificationType.ORDER_OUT_FOR_DELIVERY);
+
+            // Build the notification text
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Order is out for delivery. Items:\n");
+
+            // Iterate over itemCountMap to append item details
+            order1.getItemCountMap().forEach((itemName, count) -> {
+                stringBuilder.append(marketItemsRepository.findById(itemName).get().getName()).append(": ").append(count).append("\n");
+            });
+
+            // Set the notification text with item details
+            notification.setText(stringBuilder.toString());
+
+            notification.setTimestamp(new Date());
+            notification.setReceiver(order1.getUserId());
+            notification.setMainContextId(order1.getId());
+            notification.setUnread(true);
+            notificationRepository.save(notification);
 
             return ResponseEntity.ok(Optional.of(order1));
         }
@@ -151,6 +221,28 @@ public class OrderController {
 
             // Create pending reviews for each item in the order
             createPendingReviewsForOrder(order1);
+
+            // generate a notification:
+            Notification notification = new Notification();
+            notification.setType(NotificationType.ORDER_OUT_FOR_DELIVERY);
+
+            // Build the notification text
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Order delivered. Items:\n");
+
+            // Iterate over itemCountMap to append item details
+            order1.getItemCountMap().forEach((itemName, count) -> {
+                stringBuilder.append(marketItemsRepository.findById(itemName).get().getName()).append(": ").append(count).append("\n");
+            });
+
+            // Set the notification text with item details
+            notification.setText(stringBuilder.toString());
+
+            notification.setTimestamp(new Date());
+            notification.setReceiver(order1.getUserId());
+            notification.setMainContextId(order1.getId());
+            notification.setUnread(true);
+            notificationRepository.save(notification);
 
             return ResponseEntity.ok(Optional.of(order1));
         }
@@ -235,6 +327,68 @@ public class OrderController {
                 order.setItemCountMap(itemCountMap);
 
                 orderRepository.save(order);
+                // generate a notification:
+                Notification notification = new Notification();
+                notification.setType(NotificationType.ORDER_PLACED);
+
+                // Build the notification text
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Order Placed. Items:\n");
+
+                // Iterate over itemCountMap to append item details
+                order.getItemCountMap().forEach((itemName, count) -> {
+                    stringBuilder.append(marketItemsRepository.findById(itemName).get().getName()).append(": ").append(count).append("\n");
+                });
+
+                // Set the notification text with item details
+                notification.setText(stringBuilder.toString());
+
+                notification.setTimestamp(new Date());
+                notification.setReceiver(order.getUserId());
+                notification.setMainContextId(order.getId());
+                notification.setUnread(true);
+                notificationRepository.save(notification);
+
+                // Generate the notification
+                notification.setType(NotificationType.ORDER_RECEIVED);
+
+                StringBuilder stringBuilder1 = new StringBuilder();
+                stringBuilder1.append("Order Received. Items:\n");
+
+// Fetch the sellerId from the first item (assuming all items in the order belong to the same seller)
+                String sellerId = null;
+
+// Iterate over itemCountMap to append item details and find the sellerId
+                for (String itemId : order.getItemCountMap().keySet()) {
+                    MarketItems marketItem = marketItemsRepository.findById(itemId).orElse(null);
+                    if (marketItem != null) {
+                        // Append item details
+                        stringBuilder1.append(marketItem.getName())
+                                .append(": ")
+                                .append(order.getItemCountMap().get(itemId))
+                                .append("\n");
+
+                        // Set the sellerId from the first item
+                        if (sellerId == null) {
+                            sellerId = marketItem.getSellerId();
+                        }
+                    }
+                }
+
+// Set the notification text with item details
+                notification.setText(stringBuilder1.toString());
+                notification.setTimestamp(new Date());
+
+// Set the sellerId as the notification receiver
+                if (sellerId != null) {
+                    notification.setReceiver(sellerId);
+                } else {
+                    throw new RuntimeException("Unable to find sellerId for order " + order.getId());
+                }
+
+                notification.setUnread(true);
+                notificationRepository.save(notification);
+
 
                 System.out.println("order created: " + order);
                 // time to delete the cartItems
@@ -281,8 +435,7 @@ public class OrderController {
             case DELIVERED -> {
                 return "Delivered";
             }
-            default ->
-            {
+            default -> {
                 return "Unidentified";
             }
         }
