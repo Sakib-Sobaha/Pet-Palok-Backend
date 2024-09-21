@@ -100,7 +100,6 @@ public class SecurityConfiguration {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(new JwtAuthenticationFilter(userDetailsService()), UsernamePasswordAuthenticationFilter.class)
                 .build();
-
     }
 
 //    @Bean
@@ -109,6 +108,9 @@ public class SecurityConfiguration {
 //                .findByEmail(username)
 //                .orElseThrow(() -> new UsernameNotFoundException("User Not Found !"));
 //    }
+
+
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {

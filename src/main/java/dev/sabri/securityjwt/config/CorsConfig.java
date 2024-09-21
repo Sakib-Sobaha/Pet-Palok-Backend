@@ -9,11 +9,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*") // Allows all origins
-                        .allowedMethods("*") // Allows all HTTP methods
-                        .allowedHeaders("*") // Allows all headers
-                        .allowCredentials(true);
+                registry.addMapping("/**") // Apply CORS to all endpoints
+                        .allowedOrigins("http://localhost:3000") // Allow only your frontend origin
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow necessary HTTP methods
+                        .allowedHeaders("*") // Allow all headers
+                        .allowCredentials(true); // Allow credentials (e.g., cookies, authorization headers)
             }
         };
     }

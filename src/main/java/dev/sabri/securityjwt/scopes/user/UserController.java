@@ -56,6 +56,15 @@ public class UserController {
         return ResponseEntity.ok(userRepository.findUserById(userId));
     }
 
+    @GetMapping("/getUserByEmail")
+    public ResponseEntity<User> getUserByEmail(@RequestParam("email") String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
     record NewUserRequest(String firstName, String lastName, String email, String password) {
 
     }
