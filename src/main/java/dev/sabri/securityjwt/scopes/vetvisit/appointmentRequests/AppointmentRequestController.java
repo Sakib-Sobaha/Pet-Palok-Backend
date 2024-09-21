@@ -9,6 +9,9 @@ import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
 import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.VetRepository;
+import dev.sabri.securityjwt.scopes.vetvisit.appointments.Appointment;
+import dev.sabri.securityjwt.scopes.vetvisit.appointments.AppointmentRepository;
+import dev.sabri.securityjwt.scopes.vetvisit.appointments.AppointmentState;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @AllArgsConstructor
 @RestController
@@ -34,6 +35,8 @@ public class AppointmentRequestController {
     private PetRepository petRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @GetMapping("/vet/myRequests")
     public ResponseEntity<List<AppointmentRequest>> getMyRequests(Principal principal) {
@@ -257,6 +260,22 @@ public class AppointmentRequestController {
                 notification.setMainContextId(newAppointmentRequest.getId());
                 notification.setUnread(true);
                 notificationRepository.save(notification);
+
+                Appointment appointment = new Appointment();
+                appointment.setVetId(vet.get().getId());
+                appointment.setUserId(appointmentRequest.get().getUserId());
+                appointment.setPetId(appointmentRequest.get().getPetId());
+
+                appointment.setBookingTime(appointmentRequest.get().getBookingTime());
+                appointment.setOnline(appointmentRequest.get().isOnline());
+                appointment.setDescription(appointmentRequest.get().getDescription());
+
+                appointment.setPrescription("");
+                appointment.setMedications(new HashMap<>());
+                appointment.setTests(new ArrayList<>());
+                appointment.setState(AppointmentState.SCHEDULED);
+
+                appointmentRepository.save(appointment);
 
                 return ResponseEntity.ok(newAppointmentRequest);
             }

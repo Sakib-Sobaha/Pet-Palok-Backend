@@ -144,6 +144,7 @@ public class NotificationController {
 
     @PatchMapping("/vet/markAllAsRead")
     public ResponseEntity<Void> markAllAsReadV(Principal principal) {
+        System.out.println("Mark all as read vet noti");
         String email = principal.getName();
         Optional<Vet> vet = vetRepository.findByEmail(email);
         if (vet.isPresent()) {

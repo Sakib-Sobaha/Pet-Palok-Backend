@@ -21,7 +21,9 @@ public class AppointmentRequest {
     private String vetId;
     private String userId;
     private String petId;
+
     private Date timestamp;
+
     private Date bookingTime;
     private String description;
     private boolean online;
