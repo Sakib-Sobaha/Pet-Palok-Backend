@@ -164,7 +164,7 @@ public class SecurityConfiguration {
 //        configuration.setAllowedHeaders(List.of("*"));
 
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // or your specific frontend host
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true); // Important for cookies, authorization headers with HTTPS
 
