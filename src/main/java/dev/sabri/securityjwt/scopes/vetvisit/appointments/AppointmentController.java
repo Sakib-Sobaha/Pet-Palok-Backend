@@ -8,6 +8,7 @@ import dev.sabri.securityjwt.scopes.vetvisit.appointmentRequests.AppointmentRequ
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +59,7 @@ public class AppointmentController {
 
     @GetMapping("/{appointmentId}")
     public ResponseEntity<Appointment> getAppointmentById(@PathVariable String appointmentId) {
+        System.out.println("Fetch appointment by id: " + appointmentId);
         Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
 
         if (appointment.isPresent()) {
@@ -127,5 +129,36 @@ public class AppointmentController {
         return ResponseEntity.ok(availableSlots);
     }
 
+    // Scheduled function to update appointment status every hour
+    @Scheduled(fixedRate = 5000) // Runs every 1 hour (3600000 milliseconds)
+    public void updateState() {
+        System.out.println("update state called");
+        List<Appointment> appointments = appointmentRepository.findAll();
+        Date currentTime = new Date();
+
+        for (Appointment appointment : appointments) {
+            Date bookingTime = appointment.getBookingTime();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(bookingTime);
+            cal.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour to bookingTime
+
+            Date bookingPlusOneHour = cal.getTime();
+
+            if (currentTime.after(bookingTime) && currentTime.before(bookingPlusOneHour)) {
+                // If current time is within the appointment time, set state to ONGOING
+                appointment.setState(AppointmentState.ONGOING);
+            } else if (currentTime.after(bookingPlusOneHour)) {
+                // If current time is after booking + 1 hour, set state to COMPLETED
+                appointment.setState(AppointmentState.COMPLETED);
+            } else if (currentTime.before(bookingTime)) {
+                // Future appointments remain in SCHEDULED state
+                appointment.setState(AppointmentState.SCHEDULED);
+            }
+
+            appointmentRepository.save(appointment);
+        }
+
+        System.out.println("Appointment states updated");
+    }
 
 }

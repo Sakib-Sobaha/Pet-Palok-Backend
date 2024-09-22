@@ -31,5 +31,5 @@ public class Appointment {
     private HashMap<String, String> medications;
     private List<String> tests;
     private AppointmentState state;
-
+    private String prescriptionFile;
 }

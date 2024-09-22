@@ -273,6 +273,7 @@ public class AppointmentRequestController {
                 appointment.setPrescription("");
                 appointment.setMedications(new HashMap<>());
                 appointment.setTests(new ArrayList<>());
+                appointment.setPrescriptionFile(null);
                 appointment.setState(AppointmentState.SCHEDULED);
 
                 appointmentRepository.save(appointment);
