@@ -9,10 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.text.ParseException;
@@ -129,36 +126,77 @@ public class AppointmentController {
         return ResponseEntity.ok(availableSlots);
     }
 
-    // Scheduled function to update appointment status every hour
-    @Scheduled(fixedRate = 5000) // Runs every 1 hour (3600000 milliseconds)
+    @Scheduled(fixedRate = 5 * 60 * 1000) // Runs every hour
     public void updateState() {
-        System.out.println("update state called");
-        List<Appointment> appointments = appointmentRepository.findAll();
+        System.out.println("updateState called");
+
+        // Get the current time
         Date currentTime = new Date();
+        System.out.println("Current time: " + currentTime);
+
+        // Retrieve all appointments from the database
+        List<Appointment> appointments = appointmentRepository.findAll();
 
         for (Appointment appointment : appointments) {
             Date bookingTime = appointment.getBookingTime();
+            System.out.println("Booking time for appointment ID " + appointment.getId() + ": " + bookingTime);
+
+            // Add 1 hour to the booking time
             Calendar cal = Calendar.getInstance();
             cal.setTime(bookingTime);
-            cal.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour to bookingTime
-
+            cal.add(Calendar.HOUR_OF_DAY, 1);
             Date bookingPlusOneHour = cal.getTime();
+            System.out.println("Booking + 1 hour: " + bookingPlusOneHour);
 
+            // Check the appointment state
             if (currentTime.after(bookingTime) && currentTime.before(bookingPlusOneHour)) {
-                // If current time is within the appointment time, set state to ONGOING
                 appointment.setState(AppointmentState.ONGOING);
             } else if (currentTime.after(bookingPlusOneHour)) {
-                // If current time is after booking + 1 hour, set state to COMPLETED
                 appointment.setState(AppointmentState.COMPLETED);
             } else if (currentTime.before(bookingTime)) {
-                // Future appointments remain in SCHEDULED state
                 appointment.setState(AppointmentState.SCHEDULED);
             }
 
+            // Save the updated appointment state
             appointmentRepository.save(appointment);
+            System.out.println("Appointment ID: " + appointment.getId() + " updated to state: " + appointment.getState());
         }
 
         System.out.println("Appointment states updated");
     }
 
+
+//    @Scheduled(fixedRate = 5000) // Runs every 5 seconds
+//    public void printMessage() {
+//        System.out.println("Hello! This message prints every 5 seconds.");
+//    }
+
+
+    record NewAppUpdate(String prescription, HashMap<String,String> medications, List<String> tests, String prescriptionFile){}
+
+    @PostMapping("/update/{appointmentId}")
+    public ResponseEntity<Appointment> updateAppointment(Principal principal,@PathVariable String appointmentId, @RequestBody NewAppUpdate newAppUpdate) {
+        System.out.println("Update appointment: " + appointmentId);
+        System.out.println("prescription: " + newAppUpdate.prescription);
+        System.out.println("medications: " + newAppUpdate.medications);
+        System.out.println("tests: " + newAppUpdate.tests);
+        System.out.println("prescriptionFile: " + newAppUpdate.prescriptionFile);
+
+        String email = principal.getName();
+        Optional<Vet> vet = vetRepository.findByEmail(email);
+        if (vet.isPresent()) {
+            Optional<Appointment> appointment = appointmentRepository.findById(appointmentId);
+            if(appointment.isPresent()) {
+                Appointment temp = appointment.get();
+                temp.setTests(newAppUpdate.tests);
+                temp.setMedications(newAppUpdate.medications);
+                temp.setPrescription(newAppUpdate.prescription);
+                temp.setPrescriptionFile(newAppUpdate.prescriptionFile);
+                appointmentRepository.save(temp);
+                return ResponseEntity.ok(temp);
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
 }

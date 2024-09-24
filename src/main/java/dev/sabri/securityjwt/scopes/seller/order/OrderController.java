@@ -393,7 +393,7 @@ public class OrderController {
                 System.out.println("order created: " + order);
                 // time to delete the cartItems
 
-//                cartItemRepository.deleteAllById(newOrder.cartItemIds);
+                cartItemRepository.deleteAllById(newOrder.cartItemIds);
 
                 return ResponseEntity.ok(order);
             }
