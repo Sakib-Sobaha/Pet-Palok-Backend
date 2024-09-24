@@ -14,7 +14,7 @@
 	<name>pet-palok-backend</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>20</java.version>
 		<sonar.organization>sbouhaddi</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<maven.compiler.source>20</maven.compiler.source>
