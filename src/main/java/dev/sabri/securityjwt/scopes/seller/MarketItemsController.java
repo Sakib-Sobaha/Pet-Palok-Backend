@@ -81,6 +81,7 @@ public class MarketItemsController {
         if(newMarketItem.totalAvailableCount != null)
             marketItem.setTotalAvailableCount(newMarketItem.totalAvailableCount);
 
+        marketItem.setSold(0);
         marketItem.setRating(0f);
 
         // Handle type normalization and enum mapping

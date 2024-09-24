@@ -31,6 +31,7 @@ public class MarketItems {
     private ProductType type;
     private PetType petType;
     private String [] images;
+    private Integer sold;
 
     @Override
     public String toString() {

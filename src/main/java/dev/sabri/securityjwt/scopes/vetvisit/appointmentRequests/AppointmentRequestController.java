@@ -229,7 +229,7 @@ public class AppointmentRequestController {
     }
 
     @PostMapping("/confirmPayment/{id}")
-    public ResponseEntity<AppointmentRequest> confirmPayment(@PathVariable String id, Principal principal) {
+    public ResponseEntity<Appointment> confirmPayment(@PathVariable String id, Principal principal) {
         String email = principal.getName();
         Optional<Vet> vet = vetRepository.findByEmail(email);
         if(!vet.isPresent()) {
@@ -277,8 +277,9 @@ public class AppointmentRequestController {
                 appointment.setState(AppointmentState.SCHEDULED);
 
                 appointmentRepository.save(appointment);
+                appointmentRequestRepository.deleteById(newAppointmentRequest.getId());
 
-                return ResponseEntity.ok(newAppointmentRequest);
+                return ResponseEntity.ok(appointment);
             }
         }
         return ResponseEntity.notFound().build();

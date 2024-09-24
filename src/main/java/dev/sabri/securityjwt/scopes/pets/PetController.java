@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -89,6 +90,34 @@ public class PetController {
         return ResponseEntity.ok("Pet created Successfully");
 
     }
+
+    record Images(List<String> newImageUrls){}
+    @PostMapping("/imageUpload/{petId}")
+    public ResponseEntity<Pet> uploadImage(@RequestBody Images images, @PathVariable String petId) {
+        Optional<Pet> pet = petRepository.findById(petId);
+        if (pet.isPresent()) {
+            Pet pet1 = pet.get();
+            System.out.println("New image uploaded, urls:");
+            for(String s  : images.newImageUrls)
+                System.out.println(s);
+
+            List<String> list = pet1.getImages();
+
+            for(String s : images.newImageUrls)
+            {
+                list.add(s);
+            }
+
+            pet1.setImages(list);
+
+            petRepository.save(pet1);
+
+            return ResponseEntity.ok(pet1);
+
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 
 
 }

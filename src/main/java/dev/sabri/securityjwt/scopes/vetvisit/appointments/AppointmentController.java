@@ -136,123 +136,123 @@ public class AppointmentController {
         return ResponseEntity.ok(availableSlots);
     }
 
-//    @Scheduled(fixedRate = 5 * 60 * 1000) // Runs every hour
-//    public void updateState() {
-//        System.out.println("updateState called");
-//
-//        // Get the current time
-//        Date currentTime = new Date();
-//        System.out.println("Current time: " + currentTime);
-//
-//        // Retrieve all appointments from the database
-//        List<Appointment> appointments = appointmentRepository.findAll();
-//
-//        for (Appointment appointment : appointments) {
-//            Date bookingTime = appointment.getBookingTime();
-//            System.out.println("Booking time for appointment ID " + appointment.getId() + ": " + bookingTime);
-//
-//            // Add 1 hour to the booking time
-//            Calendar cal = Calendar.getInstance();
-//            cal.setTime(bookingTime);
-//            cal.add(Calendar.HOUR_OF_DAY, 1);
-//            Date bookingPlusOneHour = cal.getTime();
-//            System.out.println("Booking + 1 hour: " + bookingPlusOneHour);
-//
-//            // Check the appointment state
-//            AppointmentState previousState = appointment.getState();
-//
-//            if (currentTime.after(bookingTime) && currentTime.before(bookingPlusOneHour)) {
-//                appointment.setState(AppointmentState.ONGOING);
-//            } else if (currentTime.after(bookingPlusOneHour)) {
-//                appointment.setState(AppointmentState.COMPLETED);
-//            } else if (currentTime.before(bookingTime)) {
-//                appointment.setState(AppointmentState.SCHEDULED);
-//            }
-//
-//            Vet vet = vetRepository.findById(appointment.getVetId()).orElse(null);
-//            User user = userRepository.findById(appointment.getUserId()).orElse(null);
-//            Pet pet = petRepository.findById(appointment.getPetId()).orElse(null);
-//
-//            // Check if the state has changed and print a message if it has
-//            if (previousState != appointment.getState()) {
-//                System.out.println("State updated to: " + appointment.getState());
-//
-//                if (appointment.getState() == AppointmentState.ONGOING) {
-//                    Notification notification = new Notification();
-//                    notification.setType(NotificationType.APPOINTMENT_STARTED);
-//
-//                    // Build the notification text
-//                    StringBuilder stringBuilder = new StringBuilder();
-//                    stringBuilder.append("Appointment started with ");
-//                    stringBuilder.append(vet.getFirstname() + " " + vet.getLastname() + " for ");
-//                    stringBuilder.append("pet: " + pet.getName());
-//
-//                    // Set the notification text with item details
-//                    notification.setText(stringBuilder.toString());
-//
-//                    notification.setTimestamp(new Date());
-//                    notification.setReceiver(appointment.getUserId());
-//                    notification.setMainContextId(appointment.getId());
-//                    notification.setUnread(true);
-//                    notificationRepository.save(notification);
-//
-//                    stringBuilder = new StringBuilder();
-//                    stringBuilder.append("Appointment started with ");
-//                    stringBuilder.append(user.getFirstname() + " " + user.getLastname() + " for ");
-//                    stringBuilder.append("pet: " + pet.getName());
-//
-//                    // Set the notification text with item details
-//                    notification.setText(stringBuilder.toString());
-//
-//                    notification.setTimestamp(new Date());
-//                    notification.setReceiver(appointment.getVetId());
-//                    notification.setMainContextId(appointment.getId());
-//                    notification.setUnread(true);
-//                    notificationRepository.save(notification);
-//                } else if (appointment.getState() == AppointmentState.COMPLETED) {
-//                    Notification notification = new Notification();
-//                    notification.setType(NotificationType.APPOINTMENT_STARTED);
-//
-//                    // Build the notification text
-//                    StringBuilder stringBuilder = new StringBuilder();
-//                    stringBuilder.append("Appointment completed with ");
-//                    stringBuilder.append(vet.getFirstname() + " " + vet.getLastname() + " for ");
-//                    stringBuilder.append("pet: " + pet.getName());
-//
-//                    // Set the notification text with item details
-//                    notification.setText(stringBuilder.toString());
-//
-//                    notification.setTimestamp(new Date());
-//                    notification.setReceiver(appointment.getUserId());
-//                    notification.setMainContextId(appointment.getId());
-//                    notification.setUnread(true);
-//                    notificationRepository.save(notification);
-//
-//                    stringBuilder = new StringBuilder();
-//                    stringBuilder.append("Appointment completed with ");
-//                    stringBuilder.append(user.getFirstname() + " " + user.getLastname() + " for ");
-//                    stringBuilder.append("pet: " + pet.getName());
-//
-//                    // Set the notification text with item details
-//                    notification.setText(stringBuilder.toString());
-//
-//                    notification.setTimestamp(new Date());
-//                    notification.setReceiver(appointment.getVetId());
-//                    notification.setMainContextId(appointment.getId());
-//                    notification.setUnread(true);
-//                    notificationRepository.save(notification);
-//                }
-//            }
-//
-//
-//            // Save the updated appointment state
-//            appointmentRepository.save(appointment);
-//            System.out.println("Appointment ID: " + appointment.getId() + " updated to state: " + appointment.getState());
-//
-//        }
-//
-//        System.out.println("Appointment states updated");
-//    }
+    @Scheduled(fixedRate = 5 * 60 * 1000) // Runs every hour
+    public void updateState() {
+        System.out.println("updateState called");
+
+        // Get the current time
+        Date currentTime = new Date();
+        System.out.println("Current time: " + currentTime);
+
+        // Retrieve all appointments from the database
+        List<Appointment> appointments = appointmentRepository.findAll();
+
+        for (Appointment appointment : appointments) {
+            Date bookingTime = appointment.getBookingTime();
+            System.out.println("Booking time for appointment ID " + appointment.getId() + ": " + bookingTime);
+
+            // Add 1 hour to the booking time
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(bookingTime);
+            cal.add(Calendar.HOUR_OF_DAY, 1);
+            Date bookingPlusOneHour = cal.getTime();
+            System.out.println("Booking + 1 hour: " + bookingPlusOneHour);
+
+            // Check the appointment state
+            AppointmentState previousState = appointment.getState();
+
+            if (currentTime.after(bookingTime) && currentTime.before(bookingPlusOneHour)) {
+                appointment.setState(AppointmentState.ONGOING);
+            } else if (currentTime.after(bookingPlusOneHour)) {
+                appointment.setState(AppointmentState.COMPLETED);
+            } else if (currentTime.before(bookingTime)) {
+                appointment.setState(AppointmentState.SCHEDULED);
+            }
+
+            Vet vet = vetRepository.findById(appointment.getVetId()).orElse(null);
+            User user = userRepository.findById(appointment.getUserId()).orElse(null);
+            Pet pet = petRepository.findById(appointment.getPetId()).orElse(null);
+
+            // Check if the state has changed and print a message if it has
+            if (previousState != appointment.getState()) {
+                System.out.println("State updated to: " + appointment.getState());
+
+                if (appointment.getState() == AppointmentState.ONGOING) {
+                    Notification notification = new Notification();
+                    notification.setType(NotificationType.APPOINTMENT_STARTED);
+
+                    // Build the notification text
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("Appointment started with ");
+                    stringBuilder.append(vet.getFirstname() + " " + vet.getLastname() + " for ");
+                    stringBuilder.append("pet: " + pet.getName());
+
+                    // Set the notification text with item details
+                    notification.setText(stringBuilder.toString());
+
+                    notification.setTimestamp(new Date());
+                    notification.setReceiver(appointment.getUserId());
+                    notification.setMainContextId(appointment.getId());
+                    notification.setUnread(true);
+                    notificationRepository.save(notification);
+
+                    stringBuilder = new StringBuilder();
+                    stringBuilder.append("Appointment started with ");
+                    stringBuilder.append(user.getFirstname() + " " + user.getLastname() + " for ");
+                    stringBuilder.append("pet: " + pet.getName());
+
+                    // Set the notification text with item details
+                    notification.setText(stringBuilder.toString());
+
+                    notification.setTimestamp(new Date());
+                    notification.setReceiver(appointment.getVetId());
+                    notification.setMainContextId(appointment.getId());
+                    notification.setUnread(true);
+                    notificationRepository.save(notification);
+                } else if (appointment.getState() == AppointmentState.COMPLETED) {
+                    Notification notification = new Notification();
+                    notification.setType(NotificationType.APPOINTMENT_STARTED);
+
+                    // Build the notification text
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("Appointment completed with ");
+                    stringBuilder.append(vet.getFirstname() + " " + vet.getLastname() + " for ");
+                    stringBuilder.append("pet: " + pet.getName());
+
+                    // Set the notification text with item details
+                    notification.setText(stringBuilder.toString());
+
+                    notification.setTimestamp(new Date());
+                    notification.setReceiver(appointment.getUserId());
+                    notification.setMainContextId(appointment.getId());
+                    notification.setUnread(true);
+                    notificationRepository.save(notification);
+
+                    stringBuilder = new StringBuilder();
+                    stringBuilder.append("Appointment completed with ");
+                    stringBuilder.append(user.getFirstname() + " " + user.getLastname() + " for ");
+                    stringBuilder.append("pet: " + pet.getName());
+
+                    // Set the notification text with item details
+                    notification.setText(stringBuilder.toString());
+
+                    notification.setTimestamp(new Date());
+                    notification.setReceiver(appointment.getVetId());
+                    notification.setMainContextId(appointment.getId());
+                    notification.setUnread(true);
+                    notificationRepository.save(notification);
+                }
+            }
+
+
+            // Save the updated appointment state
+            appointmentRepository.save(appointment);
+            System.out.println("Appointment ID: " + appointment.getId() + " updated to state: " + appointment.getState());
+
+        }
+
+        System.out.println("Appointment states updated");
+    }
 
 
 //    @Scheduled(fixedRate = 5000) // Runs every 5 seconds
