@@ -1,9 +1,7 @@
 package dev.sabri.securityjwt.scopes.vetvisit.appointments;
 
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +12,8 @@ import java.util.List;
 @Setter
 @Getter
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "_appointments")
 
 public class Appointment {

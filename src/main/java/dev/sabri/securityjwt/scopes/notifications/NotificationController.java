@@ -7,6 +7,8 @@ import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
 import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.VetRepository;
+import dev.sabri.securityjwt.scopes.vetvisit.appointments.Appointment;
+import dev.sabri.securityjwt.scopes.vetvisit.appointments.AppointmentRepository;
 import dev.sabri.securityjwt.service.EmailService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
@@ -33,6 +32,8 @@ public class NotificationController {
     private VetRepository vetRepository;
     @Autowired
     private SellerRepository sellerRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 //    @Autowired
 //    private UserRepository userRepository;
 
@@ -114,7 +115,7 @@ public class NotificationController {
 
             // for each notification where receever == id, we set unread = false for them
             List<Notification> notifications = notificationRepository.findByReceiver(id);
-            for(Notification notification : notifications) {
+            for (Notification notification : notifications) {
                 notification.setUnread(false);
                 notificationRepository.save(notification);
             }
@@ -133,7 +134,7 @@ public class NotificationController {
 
             // for each notification where receever == id, we set unread = false for them
             List<Notification> notifications = notificationRepository.findByReceiver(id);
-            for(Notification notification : notifications) {
+            for (Notification notification : notifications) {
                 notification.setUnread(false);
                 notificationRepository.save(notification);
             }
@@ -152,12 +153,64 @@ public class NotificationController {
 
             // for each notification where receever == id, we set unread = false for them
             List<Notification> notifications = notificationRepository.findByReceiver(id);
-            for(Notification notification : notifications) {
+            for (Notification notification : notifications) {
                 notification.setUnread(false);
                 notificationRepository.save(notification);
             }
             return ResponseEntity.ok().build();
         }
+        return ResponseEntity.notFound().build();
+    }
+
+    record MeetingLinkHolder(String appointmentId, String meetingLink) {
+    }
+
+    @PostMapping("/meetingStarted")
+    public ResponseEntity<Void> meetingStarted(Principal principal, @RequestBody MeetingLinkHolder meetingLinkHolder) {
+        System.out.println("Received request for meeting link send notification");
+        String email = principal.getName();
+        Optional<Appointment> appointment = appointmentRepository.findById(meetingLinkHolder.appointmentId);
+        if (appointment.isPresent()) {
+
+            System.out.println("appointment found");
+            Notification notification = new Notification();
+            notification.setType(NotificationType.APPOINTMENT_LINK_HOLDER);
+
+            // Build the notification text
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Appointment meeting started. Room ID: ");
+
+            String str = new String(meetingLinkHolder.meetingLink);
+            String lastFourChars = "";
+
+            // Check if the string is long enough to get the last 4 characters
+            if (str.length() >= 4) {
+                lastFourChars = str.substring(str.length() - 4);
+                System.out.println("Last 4 characters: " + lastFourChars);
+            } else {
+                System.out.println("String is shorter than 4 characters: " + str);
+                return ResponseEntity.badRequest().build();
+            }
+
+            stringBuilder.append(lastFourChars);
+
+
+
+
+
+            notification.setText(stringBuilder.toString());
+//
+            notification.setTimestamp(new Date());
+            notification.setReceiver(appointment.get().getUserId());
+            System.out.println(meetingLinkHolder.meetingLink);
+            notification.setMainContextId(meetingLinkHolder.meetingLink);
+            notification.setUnread(true);
+            notificationRepository.save(notification);
+
+            return ResponseEntity.ok().build();
+
+        }
+
         return ResponseEntity.notFound().build();
     }
 
