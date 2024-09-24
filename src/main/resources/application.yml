@@ -28,4 +28,6 @@ spring:
             enable: true
 
 #JWT secret key
+#Groq
+
 
