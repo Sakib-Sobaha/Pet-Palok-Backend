@@ -10,6 +10,8 @@ import dev.sabri.securityjwt.scopes.user.UserRepository;
 import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.VetRepository;
 import dev.sabri.securityjwt.scopes.vetvisit.appointmentRequests.AppointmentRequestRepository;
+import dev.sabri.securityjwt.scopes.vetvisit.pendingAppointmentReview.PendingAppointmentReview;
+import dev.sabri.securityjwt.scopes.vetvisit.pendingAppointmentReview.PendingAppointmentReviewRepository;
 import lombok.AllArgsConstructor;
 import org.bson.io.BsonOutput;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class AppointmentController {
     private PetRepository petRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private PendingAppointmentReviewRepository pendingAppointmentReviewRepository;
 
 
     @GetMapping("/user/fetchAll")
@@ -242,13 +246,18 @@ public class AppointmentController {
                     notification.setMainContextId(appointment.getId());
                     notification.setUnread(true);
                     notificationRepository.save(notification);
+
+                    PendingAppointmentReview pendingAppointmentReview = new PendingAppointmentReview();
+                    pendingAppointmentReview.setAppointmentId(appointment.getId());
+                    pendingAppointmentReview.setUserId(user.getId());
+                    pendingAppointmentReviewRepository.save(pendingAppointmentReview);
                 }
             }
 
 
             // Save the updated appointment state
             appointmentRepository.save(appointment);
-            System.out.println("Appointment ID: " + appointment.getId() + " updated to state: " + appointment.getState());
+//            System.out.println("Appointment ID: " + appointment.getId() + " updated to state: " + appointment.getState());
 
         }
 

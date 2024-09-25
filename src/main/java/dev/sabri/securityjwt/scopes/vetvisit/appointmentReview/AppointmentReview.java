@@ -1,4 +1,4 @@
-package dev.sabri.securityjwt.scopes.seller.review;
+package dev.sabri.securityjwt.scopes.vetvisit.appointmentReview;
 
 import lombok.AllArgsConstructor;
 
@@ -14,17 +14,15 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document (collection = "_reviews")
-public class Review {
+@Document (collection = "_appointmentReviews")
+public class AppointmentReview {
     @Id
     private String id;
 
-    private String marketItemId;
+    private String vetId;
     private String userId;
-    private Integer itemRating;
-    private Integer sellerRating;
-    private String itemReview;
-    private String sellerReview;
+    private Integer vetRating;
+    private String vetReview;
     private Date timestamp;
     private boolean anonymous;
 }
