@@ -118,6 +118,12 @@ public class PetController {
         return ResponseEntity.notFound().build();
     }
 
+    @DeleteMapping("/delete/{petId}")
+    public ResponseEntity<String> deletePet(@PathVariable("petId") String petId) {
+        petRepository.deleteById(petId);
+        return ResponseEntity.ok("Pet deleted successfully");
+    }
+
 
 
 }
