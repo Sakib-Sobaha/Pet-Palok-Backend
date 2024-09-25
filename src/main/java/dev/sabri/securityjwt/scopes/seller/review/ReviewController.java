@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import dev.sabri.securityjwt.scopes.user.User;
 
@@ -139,6 +140,36 @@ public class ReviewController {
             seller.setRating((float) averageSellerRating);
             sellerRepository.save(seller);
         }
+    }
+
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<Review>> getSellerReviews(@PathVariable String sellerId) {
+        // Find the seller by the given sellerId
+        Optional<Seller> sellerOptional = sellerRepository.findById(sellerId);
+        if (sellerOptional.isPresent()) {
+            // Fetch all market items that belong to this seller
+            List<MarketItems> marketItems = marketItemsRepository.findBySellerId(sellerId);
+
+            if (marketItems.isEmpty()) {
+                return ResponseEntity.notFound().build();  // No market items found for this seller
+            }
+
+            // Get all the marketItemIds for this seller
+            List<String> marketItemIds = marketItems.stream()
+                    .map(MarketItems::getId)
+                    .collect(Collectors.toList());
+
+            // Fetch all reviews where the marketItemId is in the list of marketItemIds
+            List<Review> reviews = reviewRepository.findByMarketItemIdIn(marketItemIds);
+
+            if (reviews.isEmpty()) {
+                return ResponseEntity.noContent().build();  // No reviews found for the seller's items
+            }
+
+            return ResponseEntity.ok(reviews);  // Return the list of reviews for this seller's market items
+        }
+
+        return ResponseEntity.notFound().build();  // Seller not found
     }
 
 }

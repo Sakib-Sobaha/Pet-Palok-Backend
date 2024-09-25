@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ReviewRepository extends MongoRepository<Review, String> {
     public List<Review> findByMarketItemId(String marketItemId);
+    List<Review> findByMarketItemIdIn(List<String> marketItemIds);  // Finds all reviews for a list of market item IDs
+
 }

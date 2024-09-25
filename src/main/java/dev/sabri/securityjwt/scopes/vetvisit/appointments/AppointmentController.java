@@ -11,6 +11,7 @@ import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.VetRepository;
 import dev.sabri.securityjwt.scopes.vetvisit.appointmentRequests.AppointmentRequestRepository;
 import lombok.AllArgsConstructor;
+import org.bson.io.BsonOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -293,6 +294,7 @@ public class AppointmentController {
 
     @GetMapping("/completed")
     public ResponseEntity<List<Appointment>> getCompletedAppointments(Principal principal) {
+        System.out.println("fetch completed appointments");
         String username = principal.getName();
         Optional<User> user = userRepository.findByEmail(username);
         if (user.isPresent()) {
@@ -302,6 +304,7 @@ public class AppointmentController {
             for (Appointment appointment : appointments) {
                 if (appointment.getState().equals(AppointmentState.COMPLETED)) {
                     completedAppointments.add(appointment);
+                    System.out.println(appointment.getState());
                 }
             }
 
