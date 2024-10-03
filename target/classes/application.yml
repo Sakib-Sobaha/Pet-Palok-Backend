@@ -27,7 +27,11 @@ spring:
           starttls:
             enable: true
 
+
 #JWT secret key
 #Groq
-
+logging:
+  level:
+    org.springframework.web: DEBUG
+    
 

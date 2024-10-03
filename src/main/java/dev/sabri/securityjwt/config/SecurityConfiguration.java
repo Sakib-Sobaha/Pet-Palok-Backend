@@ -168,10 +168,10 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://pet-palok.vercel.app/")); // or your specific frontend host
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setAllowCredentials(true); // Important for cookies, authorization headers with HTTPS
+//        configuration.setAllowCredentials(true); // Important for cookies, authorization headers with HTTPS
 
         // Allow credentials if needed (be cautious with this in production)
-//        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true);
 
         // Create and register the CORS configuration for all endpoints
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
