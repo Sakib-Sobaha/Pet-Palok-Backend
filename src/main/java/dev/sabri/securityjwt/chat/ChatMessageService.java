@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -18,6 +19,7 @@ public class ChatMessageService {
                 .getChatRoomId(chatMessage.getSenderId(), chatMessage.getRecipientId(), true)
                 .orElseThrow(); // You can create your own dedicated exception
         chatMessage.setChatId(chatId);
+        chatMessage.setTimestamp(new Date());
         repository.save(chatMessage);
         return chatMessage;
     }
