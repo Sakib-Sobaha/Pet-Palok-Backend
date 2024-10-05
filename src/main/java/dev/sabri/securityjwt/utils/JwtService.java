@@ -22,7 +22,7 @@ public class JwtService {
 
     private static final String SECRET_KEY = "635266556A576E5A7234753778214125442A472D4B6150645367566B59703273";
 
-    private long jwtExpiration = 3600000;
+    private long jwtExpiration = 360000000;
     private JwtService() {
     }
 
@@ -35,7 +35,7 @@ public class JwtService {
             UserDetails userDetails
     ) {
         // 24 hours in milliseconds
-        long expirationTime = 3600000;
+        long expirationTime = 360000000;
         return Jwts
                 .builder()
                 .setClaims(extractClaim)

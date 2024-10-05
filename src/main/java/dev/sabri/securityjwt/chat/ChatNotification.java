@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,4 +16,6 @@ public class ChatNotification {
     private String senderId;
     private String recipientId;
     private String content;
+    private Date timestamp;
+    //:TODO timestamp add
 }
