@@ -52,6 +52,8 @@ public class OrderController {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    private OrderService orderService;
+
     @GetMapping("/getOrdersByUserId")
     public ResponseEntity<Optional<List<Order>>> getOrdersByUserId(Principal principal) {
         String email = principal.getName();
@@ -109,6 +111,8 @@ public class OrderController {
             orderToAccept.setStatus(OrderStatus.ACCEPTED);
             orderRepository.save(orderToAccept);
 
+            User user = userRepository.findUserById(orderToAccept.getUserId());
+
             System.out.println("Accepted order" + orderId);
 
             // generate a notification:
@@ -131,6 +135,9 @@ public class OrderController {
             notification.setMainContextId(orderToAccept.getId());
             notification.setUnread(true);
             notificationRepository.save(notification);
+
+            orderService.sendAcceptedMail(user, order);
+
 
             return ResponseEntity.ok(Optional.of(orderToAccept));
         }
@@ -167,6 +174,7 @@ public class OrderController {
             notification.setMainContextId(orderToReject.getId());
             notification.setUnread(true);
             notificationRepository.save(notification);
+
 
             return ResponseEntity.ok(Optional.of(orderToReject));
         }
