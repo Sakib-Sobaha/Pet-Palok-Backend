@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/communityPostComment")
+@RequestMapping("/api/v1/communityPostComment")
 public class CommunityPostCommentController {
     @Autowired
     private CommunityPostCommentRepository communityPostCommentRepository;
@@ -40,6 +40,7 @@ public class CommunityPostCommentController {
     public ResponseEntity<List<CommunityPostComment>> getCommunityPostComment(@PathVariable String postId) {
         Optional<CommunityPost> post = communityPostRepository.findById(postId);
         if (post.isPresent()) {
+            System.out.println("Post found.. fetching comments:");
             List<CommunityPostComment> comments = communityPostCommentRepository.findByPostId(postId);
 
             List<CommunityPostComment> filteredComments = comments.stream()
@@ -140,7 +141,7 @@ public class CommunityPostCommentController {
 
     @PostMapping("/reply")
     public ResponseEntity<CommunityPostComment> reply(@RequestBody NewReply newReply, Principal principal) {
-        System.out.println("Creating new comment for post: " + newReply.postId);
+        System.out.println("Creating new reply for post: " + newReply.postId);
         String email = principal.getName();
         if(newReply.userType.equalsIgnoreCase("user"))
         {

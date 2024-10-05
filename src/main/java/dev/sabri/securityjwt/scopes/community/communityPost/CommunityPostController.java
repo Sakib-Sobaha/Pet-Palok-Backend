@@ -1,5 +1,7 @@
 package dev.sabri.securityjwt.scopes.community.communityPost;
 
+import dev.sabri.securityjwt.scopes.community.Community;
+import dev.sabri.securityjwt.scopes.community.CommunityRepository;
 import dev.sabri.securityjwt.scopes.seller.Seller;
 import dev.sabri.securityjwt.scopes.seller.SellerRepository;
 import dev.sabri.securityjwt.scopes.user.User;
@@ -29,6 +31,8 @@ public class CommunityPostController {
     private SellerRepository sellerRepository;
     @Autowired
     private VetRepository vetRepository;
+    @Autowired
+    private CommunityRepository communityRepository;
 
     @GetMapping("/{communityId}")
     public ResponseEntity<List<CommunityPost>> getCommunityPost(@PathVariable String communityId) {
@@ -47,6 +51,17 @@ public class CommunityPostController {
         communityPost.setText(newPostRequest.text);
         communityPost.setImages(newPostRequest.images);
         communityPost.setTopics(newPostRequest.topics);
+        Optional<Community> community = communityRepository.findById(newPostRequest.communityId);
+        if(community.isPresent()) {
+            for(String s : newPostRequest.topics) {
+                if(!community.get().getTopics().contains(s))
+                {
+                    community.get().getTopics().add(s);
+                }
+            }
+        }
+        else
+            return ResponseEntity.notFound().build();
         communityPost.setTimestamp(new Date());
         communityPost.setReactList(new ArrayList<>());
         communityPost.setUserType(newPostRequest.userType);
@@ -58,6 +73,7 @@ public class CommunityPostController {
             if (user.isPresent()) {
                 communityPost.setAuthor(user.get().getId());
                 communityPostRepository.save(communityPost);
+                communityRepository.save(community.get());
                 return ResponseEntity.ok(communityPost);
             }
             return ResponseEntity.noContent().build();
@@ -66,6 +82,7 @@ public class CommunityPostController {
             if (seller.isPresent()) {
                 communityPost.setAuthor(seller.get().getId());
                 communityPostRepository.save(communityPost);
+                communityRepository.save(community.get());
                 return ResponseEntity.ok(communityPost);
             }
             return ResponseEntity.noContent().build();
@@ -74,6 +91,7 @@ public class CommunityPostController {
             if (vet.isPresent()) {
                 communityPost.setAuthor(vet.get().getId());
                 communityPostRepository.save(communityPost);
+                communityRepository.save(community.get());
                 return ResponseEntity.ok(communityPost);
             }
             return ResponseEntity.noContent().build();
