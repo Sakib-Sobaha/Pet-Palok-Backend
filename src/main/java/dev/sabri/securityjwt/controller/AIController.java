@@ -17,8 +17,8 @@ import java.util.Map;
 public class AIController {
 
     @Value("${GROQ_API_KEY}")
-    private String groqApiKey;
-//    private static final String groqApiKey = "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";
+//    private String groqApiKey;
+    private static final String groqApiKey = "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";
 
     private static final String GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 

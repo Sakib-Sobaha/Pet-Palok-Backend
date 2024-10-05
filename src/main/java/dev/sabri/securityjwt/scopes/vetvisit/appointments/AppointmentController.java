@@ -342,16 +342,24 @@ public class AppointmentController {
     public ResponseEntity<List<Map<String, Object>>> getPetTimeline(@PathVariable String petId) {
         Optional<Pet> pet = petRepository.findById(petId);
         if (pet.isPresent()) {
-            List<Appointment> appointments = appointmentRepository.findByPetId(pet.get().getId());
+            Pet petDetails = pet.get(); // Get the pet details
+            List<Appointment> appointments = appointmentRepository.findByPetId(petDetails.getId());
 
             // Create a list to hold the formatted appointment events
             List<Map<String, Object>> petTimeline = new ArrayList<>();
+
+            // Add pet's birth event as the first event
+            Map<String, Object> birthEvent = new HashMap<>();
+            birthEvent.put("id", 1); // Set id as 1 for the birth event
+            birthEvent.put("date", petDetails.getDob().toLocaleString()); // Assuming pet's DOB is stored as LocalDate or LocalDateTime
+            birthEvent.put("event", "was born");
+            petTimeline.add(birthEvent); // Add the birth event to the timeline
 
             // Map each appointment to the desired format
             for (int i = 0; i < appointments.size(); i++) {
                 Appointment appointment = appointments.get(i);
                 Map<String, Object> event = new HashMap<>();
-                event.put("id", i + 1); // Serial number starting from 1
+                event.put("id", i + 2); // Start from 2 because birth event is id 1
                 event.put("date", appointment.getBookingTime().toLocaleString()); // Assuming bookingTime is a LocalDateTime
                 event.put("event", appointment.getDescription());
 
@@ -363,6 +371,7 @@ public class AppointmentController {
 
         return ResponseEntity.notFound().build(); // Pet not found
     }
+
 
 
 
