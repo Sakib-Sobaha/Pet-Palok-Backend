@@ -51,7 +51,7 @@ public class VetController {
 
     record NewVetRequest(String email, String password){}
 
-    record UpdateVetRequest(String firstname, String lastname, String phone, String clinic_name, String clinic_address, String address, String postOffice, String district, String country, Date dob, double rating_vetvisit, String about, String image, Gender gender, Role role){
+    record UpdateVetRequest(String firstname, String lastname, String phone, String clinic_name, String clinic_address, String address, String postOffice, String district, String country, Date dob, String about, String image, Gender gender, Role role){
 
     }
 
@@ -137,9 +137,7 @@ public class VetController {
         if (request.dob() != null) {
             vet.setDob(request.dob());
         }
-        if(request.rating_vetvisit() > 0){
-            vet.setRating_vetvisit(request.rating_vetvisit());
-        }
+
         if (request.about() != null) {
             vet.setAbout(request.about());
         }

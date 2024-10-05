@@ -51,7 +51,7 @@ public class SellerController {
 
     }
 
-    record UpdateSellerRequest(String name, String storeName, String storeAddress, String slogan, String phone, String address, String postOffice, String district, String country, String about, Date dob, String image,Role role, String gender) {}
+
 
     @PostMapping
     public ResponseEntity<String> addSeller(@RequestBody NewSellerRequest newSellerRequest) {
@@ -87,6 +87,9 @@ public class SellerController {
         return ResponseEntity.ok("Password updated successfully");
     }
 
+
+    record UpdateSellerRequest(String name, String storeName, String storeAddress, String slogan, String phone, String address, String postOffice, String district, String country, String about, Date dob, String image,Role role, String gender) {}
+
     @PutMapping("/update/{sellerId}")
     public ResponseEntity<String> updateSeller(@PathVariable("sellerId") String sellerId, @RequestBody UpdateSellerRequest request) {
         Seller seller = sellerRepository.findById(sellerId).orElse(null);
@@ -119,15 +122,6 @@ public class SellerController {
         if(request.address() != null) {
             seller.setAddress(request.address());
         }
-        if(request.about() != null) {
-            seller.setAbout(request.about());
-        }
-        if(request.dob() != null) {
-            seller.setDob(request.dob());
-        }
-        if(request.image() != null){
-            seller.setImage(request.image());
-        }
         if(request.postOffice() != null) {
             seller.setPostOffice(request.postOffice());
         }
@@ -137,6 +131,17 @@ public class SellerController {
         if(request.country() != null) {
             seller.setCountry(request.country());
         }
+
+        if(request.about() != null) {
+            seller.setAbout(request.about());
+        }
+        if(request.dob() != null) {
+            seller.setDob(request.dob());
+        }
+        if(request.image() != null){
+            seller.setImage(request.image());
+        }
+
         if(request.role() != null) {
             seller.setRole(request.role());
         }
