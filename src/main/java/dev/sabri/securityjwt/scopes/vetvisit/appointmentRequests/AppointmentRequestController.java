@@ -4,6 +4,7 @@ package dev.sabri.securityjwt.scopes.vetvisit.appointmentRequests;
 import dev.sabri.securityjwt.scopes.notifications.Notification;
 import dev.sabri.securityjwt.scopes.notifications.NotificationRepository;
 import dev.sabri.securityjwt.scopes.notifications.NotificationType;
+import dev.sabri.securityjwt.scopes.pets.Pet;
 import dev.sabri.securityjwt.scopes.pets.PetRepository;
 import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
@@ -37,6 +38,8 @@ public class AppointmentRequestController {
     private NotificationRepository notificationRepository;
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private AppointmentRequestService appointmentRequestService;
 
     @GetMapping("/vet/myRequests")
     public ResponseEntity<List<AppointmentRequest>> getMyRequests(Principal principal) {
@@ -67,9 +70,14 @@ public class AppointmentRequestController {
     public ResponseEntity<AppointmentRequest> createAppointmentRequest(@RequestBody NewAppointmentRequest newAppointmentRequest, Principal principal) {
         String email = principal.getName();
         Optional<User> user = userRepository.findByEmail(email);
+        Optional<Vet> vet = vetRepository.findById(newAppointmentRequest.vetId());
+        Optional<Pet> pet = petRepository.findById(newAppointmentRequest.petId());
 
         if(user.isPresent()) {
             String userId = user.get().getId();
+
+            User user_requesting = userRepository.findUserById(userId);
+
 
             AppointmentRequest appointmentRequest = new AppointmentRequest();
 
@@ -95,11 +103,17 @@ public class AppointmentRequestController {
             // Set the notification text with item details
             notification.setText(stringBuilder.toString());
 
+            String update = stringBuilder.toString();
+
             notification.setTimestamp(new Date());
             notification.setReceiver(appointmentRequest.getVetId());
             notification.setMainContextId(null);
             notification.setUnread(true);
             notificationRepository.save(notification);
+
+            //:TODO add the email here
+            appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
+
 
             System.out.println("New Appointment Request created");
             return ResponseEntity.ok(appointmentRequest);
@@ -113,6 +127,9 @@ public class AppointmentRequestController {
         AppointmentRequest appointmentRequest = appointmentRequestRepository.findById(id).orElse(null);
         String email = principal.getName();
         Optional<Vet> vet = vetRepository.findByEmail(email);
+        Optional<User> user = userRepository.findById(appointmentRequest.getUserId());
+        Optional<Pet> pet = petRepository.findById(appointmentRequest.getPetId());
+
         if(vet.isPresent() && appointmentRequest != null) {
             String vetId = vet.get().getId();
             if(appointmentRequest.getVetId().equals(vetId)) {
@@ -130,12 +147,17 @@ public class AppointmentRequestController {
                 // Set the notification text with item details
                 notification.setText(stringBuilder.toString());
 
+                String update = stringBuilder.toString();
+
                 notification.setTimestamp(new Date());
                 notification.setReceiver(appointmentRequest.getUserId());
                 notification.setMainContextId(null);
                 notification.setUnread(true);
                 notificationRepository.save(notification);
                 appointmentRequestRepository.deleteById(appointmentRequest.getId());
+                //:TODO add email sending code here
+                appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
+
                 return ResponseEntity.ok(appointmentRequest);
             }
             else
@@ -150,6 +172,9 @@ public class AppointmentRequestController {
         AppointmentRequest appointmentRequest = appointmentRequestRepository.findById(id).orElse(null);
         String email = principal.getName();
         Optional<User> user = userRepository.findByEmail(email);
+        Optional<Vet> vet = vetRepository.findById(appointmentRequest.getVetId());
+        Optional<Pet> pet = petRepository.findById(appointmentRequest.getPetId());
+
         if(user.isPresent() && appointmentRequest != null) {
             String userId = user.get().getId();
             if(appointmentRequest.getUserId().equals(userId)) {
@@ -167,12 +192,17 @@ public class AppointmentRequestController {
                 // Set the notification text with item details
                 notification.setText(stringBuilder.toString());
 
+                String update = stringBuilder.toString();
+
                 notification.setTimestamp(new Date());
                 notification.setReceiver(appointmentRequest.getVetId());
                 notification.setMainContextId(null);
                 notification.setUnread(true);
                 notificationRepository.save(notification);
                 appointmentRequestRepository.deleteById(appointmentRequest.getId());
+                //:TODO add here
+                appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
+
                 return ResponseEntity.ok(appointmentRequest);
             }
             else
@@ -192,7 +222,11 @@ public class AppointmentRequestController {
 
         AppointmentRequest appointmentRequest = appointmentRequestRepository.findById(id).orElse(null);
         String email = principal.getName();
+
+        Optional<User> user = userRepository.findById(appointmentRequest.getUserId());
         Optional<Vet> vet = vetRepository.findByEmail(email);
+        Optional<Pet> pet = petRepository.findById(appointmentRequest.getPetId());
+
         if(vet.isPresent() && appointmentRequest != null) {
             String vetId = vet.get().getId();
             if(appointmentRequest.getVetId().equals(vetId)) {
@@ -213,11 +247,17 @@ public class AppointmentRequestController {
                 // Set the notification text with item details
                 notification.setText(stringBuilder.toString());
 
+                String update = stringBuilder.toString();
+
                 notification.setTimestamp(new Date());
                 notification.setReceiver(appointmentRequest.getUserId());
                 notification.setMainContextId(appointmentRequest.getId());
                 notification.setUnread(true);
                 notificationRepository.save(notification);
+
+                //:TODO add here
+
+                appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
 
                 return ResponseEntity.ok(appointmentRequest);
             }
@@ -231,11 +271,16 @@ public class AppointmentRequestController {
     @PostMapping("/confirmPayment/{id}")
     public ResponseEntity<Appointment> confirmPayment(@PathVariable String id, Principal principal) {
         String email = principal.getName();
+
+
         Optional<Vet> vet = vetRepository.findByEmail(email);
         if(!vet.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Optional<AppointmentRequest> appointmentRequest = appointmentRequestRepository.findById(id);
+
+        Optional<User> user = userRepository.findById(appointmentRequest.get().getUserId());
+        Optional<Pet> pet = petRepository.findById(appointmentRequest.get().getPetId());
 
         if(appointmentRequest.isPresent() && appointmentRequest.get().getVetId().equals(vet.get().getId())) {
             if(appointmentRequest.get().getVetId().equals(vet.get().getId())) {
@@ -255,11 +300,16 @@ public class AppointmentRequestController {
                 // Set the notification text with item details
                 notification.setText(stringBuilder.toString());
 
+                String update = stringBuilder.toString();
+
                 notification.setTimestamp(new Date());
                 notification.setReceiver(newAppointmentRequest.getUserId());
                 notification.setMainContextId(newAppointmentRequest.getId());
                 notification.setUnread(true);
                 notificationRepository.save(notification);
+
+                //:TODO add here
+                appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest.get(), update);
 
                 Appointment appointment = new Appointment();
                 appointment.setVetId(vet.get().getId());
@@ -293,6 +343,9 @@ public class AppointmentRequestController {
         System.out.println(timeChangeReq.newTime);
         Optional<User> user = userRepository.findByEmail(email);
         Optional<AppointmentRequest> appointmentRequest = appointmentRequestRepository.findById(id);
+        Optional<Vet> vet = vetRepository.findById(appointmentRequest.get().getVetId());
+        Optional<Pet> pet = petRepository.findById(appointmentRequest.get().getPetId());
+
         if(appointmentRequest.isPresent()) {
             if(user.isPresent()) {
                 if(appointmentRequest.get().getUserId().equals(user.get().getId())) {
@@ -312,11 +365,16 @@ public class AppointmentRequestController {
                     // Set the notification text with item details
                     notification.setText(stringBuilder.toString());
 
+                    String update = stringBuilder.toString();
+
                     notification.setTimestamp(new Date());
                     notification.setReceiver(ar.getVetId());
                     notification.setMainContextId(ar.getId());
                     notification.setUnread(true);
                     notificationRepository.save(notification);
+
+                    //:TODO here
+                    appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest.get(), update);
 
                     appointmentRequestRepository.save(ar);
                     return ResponseEntity.ok(ar);

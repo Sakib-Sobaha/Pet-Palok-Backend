@@ -9,6 +9,7 @@ import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
 import dev.sabri.securityjwt.scopes.vets.Vet;
 import dev.sabri.securityjwt.scopes.vets.VetRepository;
+import dev.sabri.securityjwt.scopes.vets.VetService;
 import dev.sabri.securityjwt.scopes.vetvisit.appointmentRequests.AppointmentRequestRepository;
 import dev.sabri.securityjwt.scopes.vetvisit.pendingAppointmentReview.PendingAppointmentReview;
 import dev.sabri.securityjwt.scopes.vetvisit.pendingAppointmentReview.PendingAppointmentReviewRepository;
@@ -43,6 +44,8 @@ public class AppointmentController {
     private NotificationRepository notificationRepository;
     @Autowired
     private PendingAppointmentReviewRepository pendingAppointmentReviewRepository;
+    @Autowired
+    private AppointmentService appointmentService;
 
 
     @GetMapping("/user/fetchAll")
@@ -195,6 +198,8 @@ public class AppointmentController {
                     // Set the notification text with item details
                     notification.setText(stringBuilder.toString());
 
+                    String update1 = stringBuilder.toString();
+
                     notification.setTimestamp(new Date());
                     notification.setReceiver(appointment.getUserId());
                     notification.setMainContextId(appointment.getId());
@@ -209,11 +214,19 @@ public class AppointmentController {
                     // Set the notification text with item details
                     notification.setText(stringBuilder.toString());
 
+                    String update2 = stringBuilder.toString();
+
                     notification.setTimestamp(new Date());
                     notification.setReceiver(appointment.getVetId());
                     notification.setMainContextId(appointment.getId());
                     notification.setUnread(true);
                     notificationRepository.save(notification);
+
+
+                    appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
+
+
+
                 } else if (appointment.getState() == AppointmentState.COMPLETED) {
                     Notification notification = new Notification();
                     notification.setType(NotificationType.APPOINTMENT_STARTED);
@@ -226,6 +239,8 @@ public class AppointmentController {
 
                     // Set the notification text with item details
                     notification.setText(stringBuilder.toString());
+
+                    String update1 = stringBuilder.toString();
 
                     notification.setTimestamp(new Date());
                     notification.setReceiver(appointment.getUserId());
@@ -241,11 +256,16 @@ public class AppointmentController {
                     // Set the notification text with item details
                     notification.setText(stringBuilder.toString());
 
+                    String update2 = stringBuilder.toString();
+
                     notification.setTimestamp(new Date());
                     notification.setReceiver(appointment.getVetId());
                     notification.setMainContextId(appointment.getId());
                     notification.setUnread(true);
                     notificationRepository.save(notification);
+
+
+                    appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
 
                     PendingAppointmentReview pendingAppointmentReview = new PendingAppointmentReview();
                     pendingAppointmentReview.setAppointmentId(appointment.getId());
