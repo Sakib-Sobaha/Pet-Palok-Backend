@@ -154,6 +154,8 @@ public class OrderController {
             orderToReject.setStatus(OrderStatus.REJECTED);
             orderRepository.save(orderToReject);
 
+            User user = userRepository.findUserById(orderToReject.getUserId());
+
             // generate a notification:
             Notification notification = new Notification();
             notification.setType(NotificationType.ORDER_DECLINED);
@@ -175,6 +177,8 @@ public class OrderController {
             notification.setUnread(true);
             notificationRepository.save(notification);
 
+            orderService.sendRejectedMail(user, order);
+
 
             return ResponseEntity.ok(Optional.of(orderToReject));
         }
@@ -189,6 +193,8 @@ public class OrderController {
             Order order1 = order.get();
             order1.setStatus(OrderStatus.OUT_FOR_DELIVERY);
             orderRepository.save(order1);
+
+            User user = userRepository.findUserById(order1.getUserId());
 
             // generate a notification:
             Notification notification = new Notification();
@@ -212,6 +218,8 @@ public class OrderController {
             notification.setUnread(true);
             notificationRepository.save(notification);
 
+            orderService.sendDeliveryConfirmedMail(user, order);
+
             return ResponseEntity.ok(Optional.of(order1));
         }
 
@@ -226,6 +234,8 @@ public class OrderController {
             Order order1 = order.get();
             order1.setStatus(OrderStatus.DELIVERED);
             orderRepository.save(order1);
+
+            User user = userRepository.findUserById(order1.getUserId());
 
             // Create pending reviews for each item in the order
             createPendingReviewsForOrder(order1);
@@ -251,6 +261,8 @@ public class OrderController {
             notification.setMainContextId(order1.getId());
             notification.setUnread(true);
             notificationRepository.save(notification);
+
+            orderService.sendDeliveredConfirmationMail(user, order);
 
             return ResponseEntity.ok(Optional.of(order1));
         }
@@ -356,6 +368,9 @@ public class OrderController {
                 notification.setMainContextId(order.getId());
                 notification.setUnread(true);
                 notificationRepository.save(notification);
+
+
+                orderService.sendOrderCreationConfirmationMail(user, order);
 
                 // Generate the notification
                 notification.setType(NotificationType.ORDER_RECEIVED);
