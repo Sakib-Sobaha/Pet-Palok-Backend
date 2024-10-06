@@ -1,4 +1,5 @@
-package dev.sabri.securityjwt.scopes.foundPost;
+package dev.sabri.securityjwt.scopes.pets.found;
+
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -6,10 +7,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import java.util.List;
 import java.util.Optional;
 
-
-public interface FoundPostRepository {
+@EnableMongoRepositories(basePackageClasses = FoundPostRepository.class)
+public interface FoundPostRepository extends MongoRepository<FoundPost, String> {
     Optional<FoundPost> findById(String id);
-    Optional<List<FoundPost>> findAll();
-    Optional<List<FoundPost>> findByAuthorId(String title);
+    List<FoundPost> findAll();
 
 }
