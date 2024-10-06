@@ -17,6 +17,7 @@ import dev.sabri.securityjwt.scopes.user.cart.CartItem;
 import dev.sabri.securityjwt.scopes.user.cart.CartItemRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -108,12 +109,27 @@ public class OrderController {
         Optional<Order> order = orderRepository.findById(orderId);
         if (order.isPresent() && order.get().getStatus() == OrderStatus.PENDING) {
             Order orderToAccept = order.get();
-            orderToAccept.setStatus(OrderStatus.ACCEPTED);
-            orderRepository.save(orderToAccept);
+
 
             User user = userRepository.findUserById(orderToAccept.getUserId());
 
             System.out.println("Accepted order" + orderId);
+            // check availability
+            for(String marketItemId : orderToAccept.getItemCountMap().keySet())
+            {
+                Optional<MarketItems> item_ = marketItemsRepository.findById(marketItemId);
+                if(item_.isPresent()) {
+                    MarketItems item = item_.get();
+                    if(orderToAccept.getItemCountMap().get(marketItemId) >= item.getTotalAvailableCount() || item.getTotalAvailableCount()==0)
+                    {
+                        System.out.println("Accepted order failed: " + orderId);
+                        return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+                    }
+                }
+            }
+            handleMarketItemUpdate(orderToAccept);
+            orderToAccept.setStatus(OrderStatus.ACCEPTED);
+            orderRepository.save(orderToAccept);
 
             // generate a notification:
             Notification notification = new Notification();
@@ -270,6 +286,15 @@ public class OrderController {
         return ResponseEntity.notFound().build();
     }
 
+    private void handleMarketItemUpdate(Order order) {
+        for(String marketItemId : order.getItemCountMap().keySet())
+        {
+            MarketItems marketItems = marketItemsRepository.findById(marketItemId).get();
+            marketItems.setSold(marketItems.getSold()+order.getItemCountMap().get(marketItemId));
+            marketItems.setTotalAvailableCount(marketItems.getTotalAvailableCount()-order.getItemCountMap().get(marketItemId));
+            marketItemsRepository.save(marketItems);
+        }
+    }
     private void createPendingReviewsForOrder(Order order) {
         for (String marketItemId : order.getItemCountMap().keySet()) {
             PendingReview newPendingReview = new PendingReview();

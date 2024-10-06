@@ -5,6 +5,7 @@ import dev.sabri.securityjwt.scopes.notifications.NotificationRepository;
 import dev.sabri.securityjwt.scopes.notifications.NotificationType;
 import dev.sabri.securityjwt.scopes.pets.Pet;
 import dev.sabri.securityjwt.scopes.pets.PetRepository;
+import dev.sabri.securityjwt.scopes.pets.PetType;
 import dev.sabri.securityjwt.scopes.user.User;
 import dev.sabri.securityjwt.scopes.user.UserRepository;
 import dev.sabri.securityjwt.scopes.vets.Vet;
@@ -25,6 +26,7 @@ import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -226,7 +228,6 @@ public class AppointmentController {
                     appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
 
 
-
                 } else if (appointment.getState() == AppointmentState.COMPLETED) {
                     Notification notification = new Notification();
                     notification.setType(NotificationType.APPOINTMENT_STARTED);
@@ -392,7 +393,55 @@ public class AppointmentController {
         return ResponseEntity.notFound().build(); // Pet not found
     }
 
+    // type 1 stats wil include unique number of users, pets
+    // also kon pet koyta kore dekhse (kon type er pet koytak ore {type: Count, type: count.. amn kore)
+    // Record to hold stats
+    public record Stats1(int uniqueUsers, int uniquePets, Map<String, Integer> petTypeMap) {
+    }
 
+    @GetMapping("/stats/type1/{vetId}")
+    public ResponseEntity<Stats1> getType1Appointments(@PathVariable String vetId) {
+        // Get all appointments
+        List<Appointment> appointments = appointmentRepository.findByVetId(vetId);
+        System.out.println("Appointments completed: " + appointments.size());
+        // Extract unique user IDs from appointments
+        Set<String> uniqueUserIds = appointments.stream()
+                .map(Appointment::getUserId)
+                .collect(Collectors.toSet());
+
+        // Extract unique pet IDs from appointments
+        Set<String> uniquePetIds = appointments.stream()
+                .map(Appointment::getPetId)
+                .collect(Collectors.toSet());
+
+        // Fetch all pets based on the pet IDs
+        List<Pet> pets = petRepository.findAllById(uniquePetIds);
+        System.out.println("Number of pets: "+pets.size());
+
+        // Create a map to count the occurrences of each pet type
+        Map<String, Integer> petTypeCountMap = new HashMap<>();
+        for (PetType type : PetType.values()) {
+            System.out.println(type);
+            petTypeCountMap.put(type.name(), 0); // Initialize with 0
+        }
+
+        // Count pet types based on appointments
+        // Count pet types based on appointments
+        for (Pet pet : pets) {
+            String petType = pet.getType().toUpperCase(); // Normalize to uppercase for case insensitivity
+            petTypeCountMap.put(petType, petTypeCountMap.getOrDefault(petType, 0) + 1);
+        }
+
+        // Prepare the final stats
+        Stats1 stats = new Stats1(
+                uniqueUserIds.size(), // Number of unique users
+                uniquePetIds.size(), // Number of unique pets
+                petTypeCountMap // Pet type wise map
+        );
+
+        // Return the response entity with the calculated stats
+        return ResponseEntity.ok(stats);
+    }
 
 
 }
