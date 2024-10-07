@@ -106,7 +106,9 @@ public class OrderController {
 
     @GetMapping("/accept/{orderId}")
     public ResponseEntity<Optional<Order>> acceptOrder(@PathVariable String orderId) {
+
         Optional<Order> order = orderRepository.findById(orderId);
+        Seller seller = new Seller();
         if (order.isPresent() && order.get().getStatus() == OrderStatus.PENDING) {
             Order orderToAccept = order.get();
 
@@ -118,6 +120,7 @@ public class OrderController {
             for(String marketItemId : orderToAccept.getItemCountMap().keySet())
             {
                 Optional<MarketItems> item_ = marketItemsRepository.findById(marketItemId);
+                seller = sellerRepository.findSellerById(item_.get().getSellerId());
                 if(item_.isPresent()) {
                     MarketItems item = item_.get();
                     if(orderToAccept.getItemCountMap().get(marketItemId) >= item.getTotalAvailableCount() || item.getTotalAvailableCount()==0)
@@ -142,6 +145,7 @@ public class OrderController {
             // Iterate over itemCountMap to append item details
             orderToAccept.getItemCountMap().forEach((itemName, count) -> {
                 stringBuilder.append(marketItemsRepository.findById(itemName).get().getName()).append(": ").append(count).append("\n");
+
             });
 
             // Set the notification text with item details
@@ -153,6 +157,9 @@ public class OrderController {
             notificationRepository.save(notification);
 
             orderService.sendAcceptedMail(user, order);
+
+            //:TODO
+            orderService.acceptedConfirmationMail(seller, order);
 
 
             return ResponseEntity.ok(Optional.of(orderToAccept));
@@ -167,6 +174,11 @@ public class OrderController {
         Optional<Order> order = orderRepository.findById(orderId);
         if (order.isPresent() && order.get().getStatus() == OrderStatus.PENDING) {
             Order orderToReject = order.get();
+            String marketItemId = orderToReject.getItemCountMap().keySet().iterator().next();
+
+            Optional<MarketItems> item = marketItemsRepository.findById(marketItemId);
+
+            Seller seller = sellerRepository.findSellerById(item.get().getSellerId());
             orderToReject.setStatus(OrderStatus.REJECTED);
             orderRepository.save(orderToReject);
 
@@ -195,6 +207,9 @@ public class OrderController {
 
             orderService.sendRejectedMail(user, order);
 
+            //:TODO
+            orderService.rejectedConfirmationMail(seller, order);
+
 
             return ResponseEntity.ok(Optional.of(orderToReject));
         }
@@ -209,6 +224,12 @@ public class OrderController {
             Order order1 = order.get();
             order1.setStatus(OrderStatus.OUT_FOR_DELIVERY);
             orderRepository.save(order1);
+
+            String marketItemId = order1.getItemCountMap().keySet().iterator().next();
+
+            Optional<MarketItems> item = marketItemsRepository.findById(marketItemId);
+
+            Seller seller = sellerRepository.findSellerById(item.get().getSellerId());
 
             User user = userRepository.findUserById(order1.getUserId());
 
@@ -236,6 +257,9 @@ public class OrderController {
 
             orderService.sendDeliveryConfirmedMail(user, order);
 
+            //:TODO
+            orderService.deliveryConfirmationMail(seller, order);
+
             return ResponseEntity.ok(Optional.of(order1));
         }
 
@@ -250,6 +274,12 @@ public class OrderController {
             Order order1 = order.get();
             order1.setStatus(OrderStatus.DELIVERED);
             orderRepository.save(order1);
+
+            String marketItemId = order1.getItemCountMap().keySet().iterator().next();
+
+            Optional<MarketItems> item = marketItemsRepository.findById(marketItemId);
+
+            Seller seller = sellerRepository.findSellerById(item.get().getSellerId());
 
             User user = userRepository.findUserById(order1.getUserId());
 
@@ -279,6 +309,9 @@ public class OrderController {
             notificationRepository.save(notification);
 
             orderService.sendDeliveredConfirmationMail(user, order);
+
+            //:TODO
+            orderService.deliveredConfirmationMail(seller, order);
 
             return ResponseEntity.ok(Optional.of(order1));
         }

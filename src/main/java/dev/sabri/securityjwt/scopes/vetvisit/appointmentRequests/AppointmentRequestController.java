@@ -114,6 +114,8 @@ public class AppointmentRequestController {
             //:TODO add the email here
             appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
 
+            appointmentRequestService.sendVetAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
+
 
             System.out.println("New Appointment Request created");
             return ResponseEntity.ok(appointmentRequest);
@@ -203,6 +205,8 @@ public class AppointmentRequestController {
                 //:TODO add here
                 appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
 
+                appointmentRequestService.sendVetAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
+
                 return ResponseEntity.ok(appointmentRequest);
             }
             else
@@ -259,6 +263,8 @@ public class AppointmentRequestController {
 
                 appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
 
+                appointmentRequestService.sendVetAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest, update);
+
                 return ResponseEntity.ok(appointmentRequest);
             }
             else
@@ -310,6 +316,8 @@ public class AppointmentRequestController {
 
                 //:TODO add here
                 appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest.get(), update);
+
+                appointmentRequestService.sendVetAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest.get(), update);
 
                 Appointment appointment = new Appointment();
                 appointment.setVetId(vet.get().getId());
@@ -375,6 +383,8 @@ public class AppointmentRequestController {
 
                     //:TODO here
                     appointmentRequestService.sendAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest.get(), update);
+
+                    appointmentRequestService.sendVetAppointmentRequestStatusEmail(user, vet, pet, appointmentRequest.get(), update);
 
                     appointmentRequestRepository.save(ar);
                     return ResponseEntity.ok(ar);

@@ -227,6 +227,8 @@ public class AppointmentController {
 
                     appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
 
+                    appointmentService.sendVetAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
+
 
                 } else if (appointment.getState() == AppointmentState.COMPLETED) {
                     Notification notification = new Notification();
@@ -267,6 +269,10 @@ public class AppointmentController {
 
 
                     appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
+
+                    appointmentService.sendVetAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
+
+
 
                     PendingAppointmentReview pendingAppointmentReview = new PendingAppointmentReview();
                     pendingAppointmentReview.setAppointmentId(appointment.getId());
