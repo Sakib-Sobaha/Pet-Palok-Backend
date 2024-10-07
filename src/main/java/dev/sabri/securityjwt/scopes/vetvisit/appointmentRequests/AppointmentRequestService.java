@@ -36,7 +36,7 @@ public record AppointmentRequestService(EmailService emailService) {
                 + "body { animation: bg-animation 5s infinite; padding: 20px; font-family: 'Cascadia Code'; }"
                 // Style for the container to be square with purple background
                 + ".email-container {"
-                + "width: 800px; height: auto; background-color: purple; border: 2px solid #007bff;"
+                + "width: auto; height: auto; background-color: purple; border: 2px solid #007bff;"
                 + "border-radius: 20px; padding: 20px; margin: 0 auto; box-shadow: 0 0 15px rgba(0,0,0,0.2);"
                 + "display: flex; flex-direction: column; justify-content: center; align-items: center;"
                 + "text-align: center;"

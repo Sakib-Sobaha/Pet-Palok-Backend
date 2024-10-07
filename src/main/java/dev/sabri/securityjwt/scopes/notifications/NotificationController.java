@@ -68,6 +68,20 @@ public class NotificationController {
         return ResponseEntity.notFound().build();
     }
 
+    @DeleteMapping("/seller/clearAll")
+    public ResponseEntity<List<Notification>> sellerClearAll(Principal principal) {
+        String email = principal.getName();
+        Optional<Seller> seller = sellerRepository.findByEmail(email);
+        if (seller.isPresent()) {
+            String id = seller.get().getId();
+            notificationRepository.deleteByReceiver(id);
+
+
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 
     @GetMapping("/vet/fetch")
     public ResponseEntity<List<Notification>> getAllVet(Principal principal) {
