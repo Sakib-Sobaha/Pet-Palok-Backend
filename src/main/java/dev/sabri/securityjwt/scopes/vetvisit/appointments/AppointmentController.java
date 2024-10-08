@@ -148,6 +148,7 @@ public class AppointmentController {
 
     @Scheduled(fixedRate = 5 * 60 * 1000) // Runs every hour
     public void updateState() {
+        System.out.println();
         System.out.println("updateState called");
 
         // Get the current time
@@ -187,7 +188,8 @@ public class AppointmentController {
             if (previousState != appointment.getState()) {
                 System.out.println("State updated to: " + appointment.getState());
 
-                if (appointment.getState() == AppointmentState.ONGOING) {
+                if (appointment.getState() == AppointmentState.ONGOING)
+                {
                     Notification notification = new Notification();
                     notification.setType(NotificationType.APPOINTMENT_STARTED);
 
@@ -224,13 +226,15 @@ public class AppointmentController {
                     notification.setUnread(true);
                     notificationRepository.save(notification);
 
+                    appointmentRepository.save(appointment);
 
                     appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
 
                     appointmentService.sendVetAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
 
 
-                } else if (appointment.getState() == AppointmentState.COMPLETED) {
+                } else if (appointment.getState() == AppointmentState.COMPLETED)
+                {
                     Notification notification = new Notification();
                     notification.setType(NotificationType.APPOINTMENT_STARTED);
 
@@ -267,6 +271,7 @@ public class AppointmentController {
                     notification.setUnread(true);
                     notificationRepository.save(notification);
 
+                    appointmentRepository.save(appointment);
 
                     appointmentService.sendAppointmentStatusEmail(user, vet, pet, appointment, update1, update2);
 
