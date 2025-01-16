@@ -85,11 +85,12 @@ public class SecurityConfiguration {
                                 new AntPathRequestMatcher("/api/v1/vet/verify"),
                                 new AntPathRequestMatcher("/api/v1/vet/resend"),
                                 new AntPathRequestMatcher("/ws/**"),
+                                new AntPathRequestMatcher("/api.together.xyz/v1/chat/completions")
 //                                new AntPathRequestMatcher("/api/**"),
 //                                new AntPathRequestMatcher("/api/v1/**"),
 //                                new AntPathRequestMatcher("/api/v1/auth/*"),
 //                                new AntPathRequestMatcher("/api/v1/auth/**"),
-                                new AntPathRequestMatcher("http://localhost:3000/**")
+//                                new AntPathRequestMatcher("http://localhost:3000/**")
                         )
                         .permitAll()
                         .anyRequest()
@@ -167,7 +168,7 @@ public class SecurityConfiguration {
 
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://pet-palok.vercel.app/")); // or your specific frontend host
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Origin", "Accept"));
 //        configuration.setAllowCredentials(true); // Important for cookies, authorization headers with HTTPS
 
         // Allow credentials if needed (be cautious with this in production)
