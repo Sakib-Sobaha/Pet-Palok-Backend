@@ -17,7 +17,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: taslimaoali
-    password: hkdf xact jaaw tqvh
+    password: ydba xxtn xkrl zwnc
     properties:
       mail:
         smtp:
@@ -33,5 +33,9 @@ spring:
 logging:
   level:
     org.springframework.web: DEBUG
+
+together:
+  api:
+    key: 558668c53f4a517804ab6cd6a71e088bfbb3bbd54faddb8a25704eb6eec10348
     
 
